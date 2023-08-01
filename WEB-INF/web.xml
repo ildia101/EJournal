@@ -281,7 +281,7 @@
 	</servlet-mapping>
 	
 	<!-- Errors -->
-	<!-- <error-page>
+	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/Errors/404.html</location>
 	</error-page>
@@ -294,7 +294,7 @@
 	<error-page>
 		<error-code>500</error-code>
 		<location>/WEB-INF/Errors/500.html</location>
-	</error-page> -->
+	</error-page>
 	
 	<session-config>
 		<session-timeout>60</session-timeout>
