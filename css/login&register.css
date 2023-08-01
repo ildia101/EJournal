@@ -1,0 +1,92 @@
+/* General */
+
+body {
+  background-color: #f1dcc9;
+  font-family: "Montserrat", sans-serif;
+}
+
+#wrapper {
+  background-color: #9f4636;
+  width: 78%;
+  height: 85%;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+#input-field {
+  background-color: #6c2d2c;
+  width: 90%;
+  height: 80%;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-background,
+.input-background-wide {
+  background-color: #42313a;
+  width: 60%;
+  height: 75px;
+
+  text-align: center;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+}
+
+.input-background-wide {
+  width: 90%;
+}
+
+/* Home page */
+
+.button-link {
+  color: #f1dcc9;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* Register and Login pages */
+
+.input-text {
+  color: #f1dcc9;
+  font-size: 24px;
+  text-align: center;
+}
+
+.input-info {
+  width: 90%;
+}
+
+#register-button,
+#login-button {
+  font-size: 20px;
+}
+
+.new-line{
+  width: 100%;
+}
+
+#error {
+  border-radius: 30px;
+  background-color: red;
+  padding: 8px 8px 8px 8px;
+}

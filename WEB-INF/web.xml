@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+						https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+	version="5.0">
+	
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<filter>
+		<filter-name>CheckSessionForEnteredLogin</filter-name>
+		<filter-class>CheckSessionForEnteredLoginFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>CheckSessionForEnteredLogin</filter-name>
+		<url-pattern>/Menu/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- Login/Register -->
+	
+	<servlet>
+		<servlet-name>LoginAndRegister</servlet-name>
+		<servlet-class>SignIn.LoginAndRegister</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>LoginAndRegister</servlet-name>
+		<url-pattern>/SignUp/CreateAccount</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>LoginAndRegister</servlet-name>
+		<url-pattern>/Login/SignIn</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Register2ndStep</servlet-name>
+		<servlet-class>SignIn.Register2ndStep</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>Register2ndStep</servlet-name>
+		<url-pattern>/SignUp/CreateAccountNextStep</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>UpdateOrganization</servlet-name>
+		<servlet-class>SignIn.UpdateYourOrganization</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UpdateOrganization</servlet-name>
+		<url-pattern>/Login/UpdateYourOrganization</url-pattern>
+	</servlet-mapping>
+	
+	<!-- MENU -->
+	<!-- CreateClassroom -->
+	
+	<servlet>
+		<servlet-name>GetAListOfStudents</servlet-name>
+		<servlet-class>Menu.CreateClassroom.GetAListOfStudents</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetAListOfStudents</servlet-name>
+		<url-pattern>/Menu/CreateClassroom/EnterAListOfStudents</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>CreatedClassroom</servlet-name>
+		<servlet-class>Menu.CreateClassroom.CreateClassroom</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>CreatedClassroom</servlet-name>
+		<url-pattern>/Menu/CreateClassroom/CreatedClassroom</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Add Information -->
+	<!-- Edit Class -->
+	
+	<servlet>
+		<servlet-name>ChooseClassroomForEditing</servlet-name>
+		<servlet-class>Menu.AddInformation.EditClassroom.ChooseClass</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>ChooseClassroomForEditing</servlet-name>
+		<url-pattern>/Menu/AddInformation/SelectClassroom</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>EditSelectedClass</servlet-name>
+		<servlet-class>Menu.AddInformation.EditClassroom.EditClassroom</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>EditSelectedClass</servlet-name>
+		<url-pattern>/Menu/AddInformation/EditClassroom</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>UpdateSelectedClass</servlet-name>
+		<servlet-class>Menu.AddInformation.EditClassroom.UpdateClassroom</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UpdateSelectedClass</servlet-name>
+		<url-pattern>/Menu/AddInformation/UpdatedClassroom</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Add subject -->
+	
+	<servlet>
+		<servlet-name>AddSubject</servlet-name>
+		<servlet-class>Menu.AddInformation.AddSubject.AddSchoolSubject</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>AddSubject</servlet-name>
+		<url-pattern>/Menu/AddInformation/AddSubject/AddNextSubject</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Add grades -->
+	
+	<servlet>
+		<servlet-name>ChooseClassAndSubject</servlet-name>
+		<servlet-class>Menu.AddInformation.AddGrades.ChooseClassAndSubject</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>ChooseClassAndSubject</servlet-name>
+		<url-pattern>/Menu/AddInformation/ChooseClassAndSubject</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetClassGrades</servlet-name>
+		<servlet-class>Menu.AddInformation.AddGrades.GetClassGrades</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetClassGrades</servlet-name>
+		<url-pattern>/Menu/AddInformation/InputGrades</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>UploadGrades</servlet-name>
+		<servlet-class>Menu.AddInformation.AddGrades.SaveGrades</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UploadGrades</servlet-name>
+		<url-pattern>/Menu/AddInformation/SaveGrades</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>TurnPage</servlet-name>
+		<servlet-class>Menu.AddInformation.AddGrades.TurnPage</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>TurnPage</servlet-name>
+		<url-pattern>/Menu/AddInformation/TurnThePage</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Delete information -->
+	
+	<servlet>
+		<servlet-name>GetClassesAndSubjects</servlet-name>
+		<servlet-class>Menu.AddInformation.DeleteInformation.GetClassesAndSubjects</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetClassesAndSubjects</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseClass</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>GetClassesAndSubjects</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseSubject</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>GetClassesAndSubjects</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseClassGrades</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DeleteInfo</servlet-name>
+		<servlet-class>Menu.AddInformation.DeleteInformation.DeleteInformation</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DeleteInfo</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteClass</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>DeleteInfo</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteSubject</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>DeleteInfo</servlet-name>
+		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteMarks</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- Report Card -->
+	
+	<servlet>
+		<servlet-name>GetClasses</servlet-name>
+		<servlet-class>Menu.ReportCard.GetClasses</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetClasses</servlet-name>
+		<url-pattern>/Menu/SelectClassToCreateReportCard</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetStudents</servlet-name>
+		<servlet-class>Menu.ReportCard.GetStudents</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetStudents</servlet-name>
+		<url-pattern>/Menu/SelectStudentToCreateReportCard</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>CreateReportCard</servlet-name>
+		<servlet-class>Menu.ReportCard.CreateReportCard</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>CreateReportCard</servlet-name>
+		<url-pattern>/Menu/CreateReportCardOfThisStudent</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Employees -->
+	
+	<servlet>
+		<servlet-name>GetListOfEmployees</servlet-name>
+		<servlet-class>Menu.EditEmployees.GetListOfEmployees</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetListOfEmployees</servlet-name>
+		<url-pattern>/Menu/Employees</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SaveEmployees</servlet-name>
+		<servlet-class>Menu.EditEmployees.SaveChanges</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>SaveEmployees</servlet-name>
+		<url-pattern>/Menu/SaveEmployees</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Sign Out -->
+	
+	<servlet>
+		<servlet-name>SignOut</servlet-name>
+		<servlet-class>Menu.SignOut</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>SignOut</servlet-name>
+		<url-pattern>/Menu/SignOut</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Errors -->
+	<!-- <error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/Errors/404.html</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>405</error-code>
+		<location>/WEB-INF/Errors/405.html</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>500</error-code>
+		<location>/WEB-INF/Errors/500.html</location>
+	</error-page> -->
+	
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+</web-app>
