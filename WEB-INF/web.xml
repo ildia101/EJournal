@@ -13,7 +13,7 @@
 	
 	<filter>
 		<filter-name>CheckSessionForEnteredLogin</filter-name>
-		<filter-class>CheckSessionForEnteredLoginFilter</filter-class>
+		<filter-class>org.ejournal.filter.CheckSessionForEnteredLoginFilter</filter-class>
 	</filter>
 	
 	<filter-mapping>
@@ -25,7 +25,7 @@
 	
 	<servlet>
 		<servlet-name>LoginAndRegister</servlet-name>
-		<servlet-class>SignIn.LoginAndRegister</servlet-class>
+		<servlet-class>org.ejournal.servlet.signin.LoginAndRegisterHttpServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
@@ -41,7 +41,7 @@
 	
 	<servlet>
 		<servlet-name>Register2ndStep</servlet-name>
-		<servlet-class>SignIn.Register2ndStep</servlet-class>
+		<servlet-class>org.ejournal.servlet.signin.Register2ndStepHttpServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	
@@ -52,7 +52,7 @@
 	
 	<servlet>
 		<servlet-name>UpdateOrganization</servlet-name>
-		<servlet-class>SignIn.UpdateYourOrganization</servlet-class>
+		<servlet-class>org.ejournal.servlet.signin.UpdateYourOrganizationHttpServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	
@@ -66,7 +66,7 @@
 	
 	<servlet>
 		<servlet-name>GetAListOfStudents</servlet-name>
-		<servlet-class>Menu.CreateClassroom.GetAListOfStudents</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.createclassroom.GetAListOfStudentsHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -76,7 +76,7 @@
 	
 	<servlet>
 		<servlet-name>CreatedClassroom</servlet-name>
-		<servlet-class>Menu.CreateClassroom.CreateClassroom</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.createclassroom.CreateClassroomHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -89,7 +89,7 @@
 	
 	<servlet>
 		<servlet-name>ChooseClassroomForEditing</servlet-name>
-		<servlet-class>Menu.AddInformation.EditClassroom.ChooseClass</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.editclassroom.ChooseClassHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -99,7 +99,7 @@
 	
 	<servlet>
 		<servlet-name>EditSelectedClass</servlet-name>
-		<servlet-class>Menu.AddInformation.EditClassroom.EditClassroom</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.editclassroom.EditClassroomHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -109,7 +109,7 @@
 	
 	<servlet>
 		<servlet-name>UpdateSelectedClass</servlet-name>
-		<servlet-class>Menu.AddInformation.EditClassroom.UpdateClassroom</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.editclassroom.UpdateClassroomHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -121,7 +121,7 @@
 	
 	<servlet>
 		<servlet-name>AddSubject</servlet-name>
-		<servlet-class>Menu.AddInformation.AddSubject.AddSchoolSubject</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.addsubject.AddSchoolSubjectHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -133,7 +133,7 @@
 	
 	<servlet>
 		<servlet-name>ChooseClassAndSubject</servlet-name>
-		<servlet-class>Menu.AddInformation.AddGrades.ChooseClassAndSubject</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.addgrades.ChooseClassAndSubjectHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -143,7 +143,7 @@
 	
 	<servlet>
 		<servlet-name>GetClassGrades</servlet-name>
-		<servlet-class>Menu.AddInformation.AddGrades.GetClassGrades</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.addgrades.GetClassGradesHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -153,7 +153,7 @@
 	
 	<servlet>
 		<servlet-name>UploadGrades</servlet-name>
-		<servlet-class>Menu.AddInformation.AddGrades.SaveGrades</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.addgrades.SaveGradesHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -163,7 +163,7 @@
 	
 	<servlet>
 		<servlet-name>TurnPage</servlet-name>
-		<servlet-class>Menu.AddInformation.AddGrades.TurnPage</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.addgrades.TurnPageHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -175,7 +175,7 @@
 	
 	<servlet>
 		<servlet-name>GetClassesAndSubjects</servlet-name>
-		<servlet-class>Menu.AddInformation.DeleteInformation.GetClassesAndSubjects</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.deleteinformation.GetClassesAndSubjectsHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -195,7 +195,7 @@
 	
 	<servlet>
 		<servlet-name>DeleteInfo</servlet-name>
-		<servlet-class>Menu.AddInformation.DeleteInformation.DeleteInformation</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.addinformation.deleteinformation.DeleteInformationHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -218,7 +218,7 @@
 	
 	<servlet>
 		<servlet-name>GetClasses</servlet-name>
-		<servlet-class>Menu.ReportCard.GetClasses</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.reportcard.GetClassesHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -228,7 +228,7 @@
 	
 	<servlet>
 		<servlet-name>GetStudents</servlet-name>
-		<servlet-class>Menu.ReportCard.GetStudents</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.reportcard.GetStudentsHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -238,7 +238,7 @@
 	
 	<servlet>
 		<servlet-name>CreateReportCard</servlet-name>
-		<servlet-class>Menu.ReportCard.CreateReportCard</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.reportcard.CreateReportCardHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -250,7 +250,7 @@
 	
 	<servlet>
 		<servlet-name>GetListOfEmployees</servlet-name>
-		<servlet-class>Menu.EditEmployees.GetListOfEmployees</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.editemployees.GetListOfEmployeesHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -260,7 +260,7 @@
 	
 	<servlet>
 		<servlet-name>SaveEmployees</servlet-name>
-		<servlet-class>Menu.EditEmployees.SaveChanges</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.editemployees.SaveChangesHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -272,7 +272,7 @@
 	
 	<servlet>
 		<servlet-name>SignOut</servlet-name>
-		<servlet-class>Menu.SignOut</servlet-class>
+		<servlet-class>org.ejournal.servlet.menu.SignOutHttpServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
