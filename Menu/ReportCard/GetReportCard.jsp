@@ -18,7 +18,7 @@
         <table>
           <tr>
             <td>Табель успішності</td>
-            <td colspan="88">ПІБ</td>
+            <td colspan="88">${sessionScope.NameOfStudent}</td>
           </tr>
           <tr>
             <td>Предмет</td>

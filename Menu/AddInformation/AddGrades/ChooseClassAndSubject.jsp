@@ -46,7 +46,7 @@
           <c:if test="${Error == true}">
             <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
             <span class="new-line"></span>
-            <p id="Error"><c:out value="${InvalidData}" /></p>
+            <p id="error"><c:out value="${InvalidData}" /></p>
           </c:if>
         </center>
       </div>
