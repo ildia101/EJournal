@@ -2,18 +2,29 @@ package org.ejournal.servlet.menu.addinformation.deleteinformation;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.MarksDAO;
+import org.ejournal.dao.SubjectsDAO;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class DeleteInformationHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+    private SubjectsDAO subjectsDAO;
+    private MarksDAO marksDAO;
+
+    public DeleteInformationHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+        this.subjectsDAO = new SubjectsDAO();
+        this.marksDAO = new MarksDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
         String button = request.getParameter("button");
 
@@ -27,8 +38,8 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteClass/ChooseClass.jsp", request, response);
 
                 try {
-                    statement.executeUpdate("DELETE FROM classes WHERE organization = \"" + session.getAttribute("Organization") + "\" AND classroom = \"" + objectToDelete + "\";");
-                    statement.executeUpdate("DELETE FROM marks WHERE organization = \"" + session.getAttribute("Organization") + "\" AND classroom = \"" + objectToDelete + "\";");
+                    classesDAO.deleteClassroom((String) session.getAttribute("Organization"), objectToDelete);
+                    marksDAO.deleteClassroomMarks((String) session.getAttribute("Organization"), objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -43,8 +54,8 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteSubject/ChooseSubject.jsp", request, response);
 
                 try {
-                    statement.executeUpdate("DELETE FROM subjects WHERE organization = \"" + session.getAttribute("Organization") + "\" AND subject = \"" + objectToDelete + "\";");
-                    statement.executeUpdate("DELETE FROM marks WHERE organization = \"" + session.getAttribute("Organization") + "\" AND subject = \"" + objectToDelete + "\";");
+                    subjectsDAO.deleteSubject((String) session.getAttribute("Organization"), objectToDelete);
+                    marksDAO.deleteSubjectMarks((String) session.getAttribute("Organization"), objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -59,7 +70,7 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteMarks/ChooseClass.jsp", request, response);
 
                 try {
-                    statement.executeUpdate("DELETE FROM marks WHERE organization = \"" + session.getAttribute("Organization") + "\" AND classroom = \"" + objectToDelete + "\";");
+                    marksDAO.deleteClassroomMarks((String) session.getAttribute("Organization"), objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

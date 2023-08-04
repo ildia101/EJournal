@@ -3,15 +3,20 @@ package org.ejournal.servlet.menu.createclassroom;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 
 public class GetAListOfStudentsHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+
+    public GetAListOfStudentsHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-		Statement statement = (Statement) session.getAttribute("DBAccess");
 
         String number = request.getParameter("number");
         String letter = request.getParameter("letter");
@@ -40,31 +45,30 @@ public class GetAListOfStudentsHttpServlet extends HttpServlet {
             request.setAttribute("InvalidData", "Невірне значення у полі кількості учнів");
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
             requestDispatcher.forward(request, response);
-        }
-
-        String classroom = number + "-" + letter;
+        } else {
+			String classroom = number + "-" + letter;
 		
-		try {
-            ResultSet DBSearch = statement.executeQuery("SELECT classroom FROM classes WHERE organization LIKE \"" + session.getAttribute("Organization") + "\";");
-            while (DBSearch.next()){
-                String existingClass = DBSearch.getString("classroom");
-                if(Objects.equals(existingClass, classroom)){
-                    request.setAttribute("Error", true);
-                    request.setAttribute("InvalidData", "Такий клас вже існує");
-                    RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
-                    requestDispatcher.forward(request, response);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+			try {
+				String classes[] = classesDAO.getClassesOfThisOrganization((String) session.getAttribute("Organization"));
+				for (int i = 0; i < classes.length; i++) {
+					if(Objects.equals(classes[i], classroom)){
+						request.setAttribute("Error", true);
+						request.setAttribute("InvalidData", "Такий клас вже існує");
+						RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+						requestDispatcher.forward(request, response);
+					}
+				}
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
 		
-        String students[] = new String[numberOfStudents];
+			String students[] = new String[numberOfStudents];
 
-        session.setAttribute("Classroom", classroom);
-        session.setAttribute("ListOfStudents", students);
+			session.setAttribute("Classroom", classroom);
+			session.setAttribute("ListOfStudents", students);
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("2ndStep.jsp");
-        requestDispatcher.forward(request, response);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher("2ndStep.jsp");
+			requestDispatcher.forward(request, response);
+		}
     }
 }

@@ -2,36 +2,33 @@ package org.ejournal.servlet.menu.reportcard;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 public class GetClassesHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+
+    public GetClassesHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
-        ArrayList<String> classes = new ArrayList<>();
-
-        ResultSet resultSet;
+        String classes[];
         try {
-            resultSet = statement.executeQuery("SELECT classroom FROM classes WHERE organization LIKE \"" + session.getAttribute("Organization") +"\";");
-            while (resultSet.next()){
-                classes.add(resultSet.getString("classroom"));
-            }
-
+            classes = classesDAO.getClassesOfThisOrganization((String) session.getAttribute("Organization"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-        Stream<String> str = Stream.of(classes.toArray(new String[0])).sorted(collator);
+        Stream<String> str = Stream.of(classes).sorted(collator);
         String classesList[] = str.toArray(String[]::new);
         for (int i = 0; i < classesList.length - 1; i++) {
             for(int j = 0; j < classesList.length - i - 1; j++) {

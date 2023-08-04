@@ -3,6 +3,8 @@ package org.ejournal.servlet.menu.editemployees;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.entities.UserEntity;
 import java.io.IOException;
 import java.sql.*;
 import java.text.Collator;
@@ -10,45 +12,40 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class GetListOfEmployeesHttpServlet extends HttpServlet {
+    private UsersDAO usersDAO;
+
+    public GetListOfEmployeesHttpServlet() throws SQLException {
+        this.usersDAO = new UsersDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
-        List<String> listOfEmployees = new ArrayList<>();
-        List<String> listOfRoles = new ArrayList<>();
-        List<String> listOfPrincipals = new ArrayList<>();
+
+        ArrayList<UserEntity> employees;
+        ArrayList<String> listOfEmployees = new ArrayList<>();
+        ArrayList<String> listOfRoles = new ArrayList<>();
+        ArrayList<String> listOfPrincipals = new ArrayList<>();
 
         try {
-            ResultSet DBSearch = statement.executeQuery("SELECT name FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\";");
-            while (DBSearch.next()) {
-                listOfEmployees.add(DBSearch.getString("name"));
-            }
+            employees = usersDAO.getEmployees((String) session.getAttribute("Organization"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < employees.size(); i++) {
+            UserEntity thisEmployee = employees.get(i);
+            if(Objects.equals(thisEmployee.getRole(), "principal")){
+                listOfPrincipals.add(thisEmployee.getName());
+            } else {
+                listOfEmployees.add(thisEmployee.getName());
+                listOfRoles.add(thisEmployee.getRole());
+            }
         }
 
         Collator collator = Collator.getInstance(new Locale("uk", "UA"));
         Stream<String> str = Stream.of(listOfEmployees.toArray(new String[0])).sorted(collator);
         listOfEmployees = new ArrayList<>(Arrays.asList(str.toArray(String[]::new)));
-
-        try {
-            ResultSet DBSearch;
-            for (int i = 0; i < listOfEmployees.size(); i++) {
-                DBSearch = statement.executeQuery("SELECT role FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND name LIKE \"" + listOfEmployees.get(i) + "\";");
-                DBSearch.next();
-                if(Objects.equals(DBSearch.getString("role"), "principal")){
-                    listOfPrincipals.add(listOfEmployees.get(i));
-                } else {
-                    listOfRoles.add(DBSearch.getString("role"));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        for (int i = 0; i < listOfPrincipals.size(); i++) {
-            listOfEmployees.remove(listOfPrincipals.get(i));
-        }
         
         str = Stream.of(listOfPrincipals.toArray(new String[0])).sorted(collator);
         listOfPrincipals = new ArrayList<>(Arrays.asList(str.toArray(String[]::new)));

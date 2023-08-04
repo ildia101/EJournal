@@ -2,36 +2,40 @@ package org.ejournal.servlet.menu.reportcard;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.MarksDAO;
+import org.ejournal.dao.SubjectsDAO;
+import org.ejournal.dao.entities.MarksEntity;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateReportCardHttpServlet extends HttpServlet {
+    private SubjectsDAO subjectsDAO;
+    private MarksDAO marksDAO;
+
+    public CreateReportCardHttpServlet() throws SQLException {
+        this.subjectsDAO = new SubjectsDAO();
+        this.marksDAO = new MarksDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
         String students[] = (String[]) session.getAttribute("StudentsFromThisClass");
 
         for (int i = 0; i < students.length; i++) {
             if(request.getParameter("Student" + i)!=null) {
                 try {
+					session.setAttribute("NameOfStudent", students[i]);
                     String classroom = (String) session.getAttribute("Classroom");
 
-                    ArrayList<String> subjects = new ArrayList<>();
-                    ResultSet resultSet = statement.executeQuery("SELECT subject FROM subjects WHERE organization LIKE \"" + session.getAttribute("Organization") + "\";");
-                    while (resultSet.next()) {
-                        subjects.add(resultSet.getString("subject"));
-                    }
+                    String subjects[] = subjectsDAO.getSubjectsOfThisOrganization((String) session.getAttribute("Organization"));
                     Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-                    Stream<String> str = Stream.of(subjects.toArray(new String[0])).sorted(collator);
+                    Stream<String> str = Stream.of(subjects).sorted(collator);
                     String subjectsList[] = str.toArray(String[]::new);
 
                     session.setAttribute("Subjects", subjectsList);
@@ -43,43 +47,16 @@ public class CreateReportCardHttpServlet extends HttpServlet {
                         boolean turnPage = true;
 
                         while (turnPage) {
-                            String dates[] = null;
-                            String marks[][] = new String[students.length][17];
-
-                            resultSet = statement.executeQuery("SELECT dates FROM marks WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND classroom LIKE \"" + classroom + "\" AND subject LIKE \"" + subjectsList[j] + "\" AND page LIKE \"" + numberOfPage + "\";");
-                            if (resultSet.next()) {
-                                dates = resultSet.getString("dates").split(", ");
-
-                                for (int k = 0; k < dates.length; k++) {
-                                    if (Objects.equals(dates[k], "null")) {
-                                        dates[k] = null;
-                                    }
-                                }
+                            MarksEntity marksInfo = marksDAO.getMarks((String) session.getAttribute("Organization"), classroom, subjectsList[j], numberOfPage, students.length);
+                            if(marksInfo==null){
+                               break;
                             }
 
-                            if(dates==null){
-                                break;
-                            }
+                            String dates[];
+                            String marks[][];
 
-                            resultSet = statement.executeQuery("SELECT marks FROM marks WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND classroom LIKE \"" + classroom + "\" AND subject LIKE \"" + subjectsList[j] + "\" AND page LIKE \"" + numberOfPage + "\";");
-                            if (resultSet.next()) {
-                                String packedArr = resultSet.getString("marks");
-                                packedArr = packedArr.substring(0, packedArr.length() - 1).replace("[", "");
-
-                                String partUnpackedArr[] = packedArr.split("], ");
-
-                                for (int k = 0; k < partUnpackedArr.length; k++) {
-                                    String temp[] = partUnpackedArr[k].split(", ");
-
-                                    for (int l = 0; l < 17; l++) {
-                                        if (Objects.equals(temp[l], "null")) {
-                                            marks[k][l] = null;
-                                        } else {
-                                            marks[k][l] = temp[l];
-                                        }
-                                    }
-                                }
-                            }
+                            dates = marksInfo.getDates();
+                            marks = marksInfo.getMarks();
 
                             for (int k = 0; k < dates.length; k++) {
                                 if (Objects.equals(dates[k], "Ñ")) {
@@ -94,7 +71,7 @@ public class CreateReportCardHttpServlet extends HttpServlet {
                             }
 
                             for (int k = 0; k < 3; k++) {
-                                if(grades[j][k]==null){
+                                if (grades[j][k] == null) {
                                     turnPage = true;
                                     numberOfPage++;
                                     break;

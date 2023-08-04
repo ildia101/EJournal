@@ -5,20 +5,26 @@ import java.sql.*;
 import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.UsersDAO;
 
 public class Register2ndStepHttpServlet extends HttpServlet {
+    private UsersDAO usersDAO;
+
+    public Register2ndStepHttpServlet() throws SQLException {
+        this.usersDAO = new UsersDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement)session.getAttribute("DBAccess");
 
         String code = request.getParameter("code");
         boolean RealOrganization = false;
 
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT organization FROM users;");
-            while (resultSet.next()){
-                if(Objects.equals(resultSet.getString("organization"), code)){
+            String allOrganizations[] = usersDAO.getAllOrganizations();
+            for (int i = 0; i < allOrganizations.length; i++) {
+                if(Objects.equals(allOrganizations[i], code)){
                     RealOrganization = true;
                     break;
                 }
@@ -31,7 +37,7 @@ public class Register2ndStepHttpServlet extends HttpServlet {
                     String email = (String)session.getAttribute("Email");
                     String password = (String)session.getAttribute("Password");
 
-                    statement.executeUpdate("INSERT INTO users VALUES('" + code + "', '" + role + "', '" + name + "', '" + email + "', '" + password + "')");
+                    usersDAO.createUser(code, role, name, email, password);
 
                     session.removeAttribute("Role");
                     session.removeAttribute("Name");

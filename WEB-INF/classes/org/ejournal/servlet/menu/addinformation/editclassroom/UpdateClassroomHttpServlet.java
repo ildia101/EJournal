@@ -3,16 +3,21 @@ package org.ejournal.servlet.menu.addinformation.editclassroom;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
 
 
 public class UpdateClassroomHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+
+    public UpdateClassroomHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
         
         boolean addToDB = true;
 
@@ -32,7 +37,7 @@ public class UpdateClassroomHttpServlet extends HttpServlet {
             String studentsList = Arrays.toString(students).replace("'", "''").replace("[", "").replace("]", "");
             
             try {
-                statement.executeUpdate("UPDATE classes SET students = '" + studentsList + "' WHERE classroom = '" + classroom + "' AND organization LIKE '" + organization + "';");
+                classesDAO.updateStudentsInClass(organization, classroom, studentsList);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

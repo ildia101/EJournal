@@ -3,116 +3,131 @@ package org.ejournal.servlet.menu.editemployees;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.entities.UserEntity;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class SaveChangesHttpServlet extends HttpServlet {
+    private UsersDAO usersDAO;
+
+    public SaveChangesHttpServlet() throws SQLException {
+        this.usersDAO = new UsersDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
-
-        int counter = 0;
+        ArrayList<UserEntity> employees = null;
         try {
-            ResultSet DBSearch = statement.executeQuery("SELECT name FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\";");
-            while (DBSearch.next()){
-                counter++;
-            }
+            employees = usersDAO.getEmployees((String) session.getAttribute("Organization"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        if(request.getParameter("SaveChanges")!=null){
-            try {
-                ResultSet DBSearch;
-                boolean changeRoleOfThisEmployee;
-                for (int i = 0; i < counter; i++) {
-                    changeRoleOfThisEmployee = true;
-                    DBSearch = statement.executeQuery("SELECT role FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND name LIKE \"" + request.getParameter("employee" + i) + "\";");
-                    DBSearch.next();
-                    String role = DBSearch.getString("role");
-                    if(Objects.equals(role, "principal")) {
-                        String newRole = request.getParameter("JobTitle" + i);
-                        if (!role.equals(newRole)) {
-                            ArrayList<String> listOfRoles = new ArrayList<>();
-                            DBSearch = statement.executeQuery("SELECT role FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\";");
-                            while (DBSearch.next()) {
-                                listOfRoles.add(DBSearch.getString("role"));
-                            }
-                            listOfRoles.remove(role);
+        if (request.getParameter("SaveChanges") != null) {
+            boolean changeRoleOfThisEmployee;
+            for (int i = 0; i < employees.size(); i++) {
+                changeRoleOfThisEmployee = true;
+                UserEntity thisEmployee = null;
+                for (int j = 0; j < employees.size(); j++) {
+                    thisEmployee = employees.get(j);
+                    if (Objects.equals(thisEmployee.getName(), request.getParameter("employee" + i))) {
+                        break;
+                    }
+                }
+                String role = thisEmployee.getRole();
+                if (Objects.equals(role, "principal")) {
+                    String newRole = request.getParameter("JobTitle" + i);
+                    if (!role.equals(newRole)) {
+                        ArrayList<String> listOfRoles = new ArrayList<>();
+                        for (int j = 0; j < employees.size(); j++) {
+                            listOfRoles.add(employees.get(j).getRole());
+                        }
+                        listOfRoles.remove(role);
 
+                        for (int j = 0; j < listOfRoles.size(); j++) {
+                            if (Objects.equals(listOfRoles.get(j), "principal")) {
+                                changeRoleOfThisEmployee = true;
+                                break;
+                            } else {
+                                changeRoleOfThisEmployee = false;
+                            }
+                        }
+                    }
+                }
+
+                if (changeRoleOfThisEmployee) {
+                    try {
+                        usersDAO.updateUserRole((String) session.getAttribute("Organization"), request.getParameter("employee" + i), request.getParameter("JobTitle" + i));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    request.setAttribute("SomeInfo", true);
+                    request.setAttribute("Info", "Призначте іншого директора перед видаленням цього");
+
+                    RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
+                    requestDispatcher.forward(request, response);
+                }
+            }
+
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditEmployees/UpdatedEmployees.html");
+            requestDispatcher.forward(request, response);
+        } else {
+            for (int i = 0; i < employees.size(); i++) {
+                if (request.getParameter("Delete" + i) != null) {
+                    boolean deleteThisEmployee = true;
+
+                    UserEntity thisEmployee = null;
+                    for (int j = 0; j < employees.size(); j++) {
+                        thisEmployee = employees.get(j);
+                        if (Objects.equals(thisEmployee.getName(), request.getParameter("employee" + i))) {
+                            break;
+                        }
+                    }
+                    String role = thisEmployee.getRole();
+                    if (Objects.equals(role, "principal")) {
+                        ArrayList<String> listOfRoles = new ArrayList<>();
+                        for (int j = 0; j < employees.size(); j++) {
+                            listOfRoles.add(employees.get(j).getRole());
+                        }
+                        listOfRoles.remove(role);
+
+                        if (listOfRoles.size() == 0) {
+                            deleteThisEmployee = false;
+                        } else {
                             for (int j = 0; j < listOfRoles.size(); j++) {
                                 if (Objects.equals(listOfRoles.get(j), "principal")) {
-                                    changeRoleOfThisEmployee = true;
+                                    deleteThisEmployee = true;
                                     break;
                                 } else {
-                                    changeRoleOfThisEmployee = false;
+                                    deleteThisEmployee = false;
                                 }
                             }
                         }
                     }
 
-                    if(changeRoleOfThisEmployee) {
-                        statement.executeUpdate("UPDATE users SET role = '" + request.getParameter("JobTitle" + i) + "' WHERE name = '" + request.getParameter("employee" + i) + "' AND organization LIKE '" + session.getAttribute("Organization") + "';");
+                    if (deleteThisEmployee) {
+                        for (int j = 0; j < employees.size(); j++) {
+                            UserEntity employee = employees.get(j);
+                            if(Objects.equals(employee.getName(), request.getParameter("employee" + i))){
+                                try {
+                                    usersDAO.updateUserOrganization(employee.getEmail(), "null", (String) session.getAttribute("Organization"));
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                break;
+                            }
+                        }
                     } else {
                         request.setAttribute("SomeInfo", true);
                         request.setAttribute("Info", "Призначте іншого директора перед видаленням цього");
 
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
                         requestDispatcher.forward(request, response);
-                    }
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditEmployees/UpdatedEmployees.html");
-            requestDispatcher.forward(request, response);
-        } else {
-            for (int i = 0; i < counter; i++) {
-                if(request.getParameter("Delete" + i)!=null){
-                    try {
-                        boolean deleteThisEmployee = true;
-
-                        ResultSet DBSearch = statement.executeQuery("SELECT role FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND name LIKE \"" + request.getParameter("employee" + i) + "\";");
-                        DBSearch.next();
-                        String role = DBSearch.getString("role");
-                        if(Objects.equals(role, "principal")){
-                            ArrayList<String> listOfRoles = new ArrayList<>();
-                            for (int j = 0; j < counter; j++) {
-                                DBSearch = statement.executeQuery("SELECT role FROM users WHERE organization LIKE \"" + session.getAttribute("Organization") + "\" AND name LIKE \"" + request.getParameter("employee" + j) + "\";");
-                                DBSearch.next();
-                                listOfRoles.add(DBSearch.getString("role"));
-                            }
-                            listOfRoles.remove(role);
-
-                            if(listOfRoles.size()==0){
-                                deleteThisEmployee = false;
-                            } else {
-                                for (int j = 0; j < listOfRoles.size(); j++) {
-                                    if(Objects.equals(listOfRoles.get(j), "principal")){
-                                        deleteThisEmployee = true;
-                                        break;
-                                    } else {
-                                        deleteThisEmployee = false;
-                                    }
-                                }
-                            }
-                        }
-
-                        if(deleteThisEmployee) {
-                            statement.executeUpdate("UPDATE users SET organization = 'null' WHERE name = '" + request.getParameter("employee" + i) + "' AND organization LIKE '" + session.getAttribute("Organization") + "';");
-                        } else {
-                            request.setAttribute("SomeInfo", true);
-                            request.setAttribute("Info", "Призначте іншого директора перед видаленням цього");
-
-                            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
-                            requestDispatcher.forward(request, response);
-                        }
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
                     }
 
                     break;

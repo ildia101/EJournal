@@ -4,16 +4,21 @@ import java.sql.*;
 import java.util.Arrays;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 public class CreateClassroomHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+
+    public CreateClassroomHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
         boolean addToDB = true;
 
@@ -36,7 +41,7 @@ public class CreateClassroomHttpServlet extends HttpServlet {
             String studentsList = Arrays.toString(students).replace("'", "''").replace("[", "").replace("]", "");
 
             try {
-                statement.executeUpdate("INSERT INTO classes(organization, classroom, students) VALUES('" + organization + "', '" + classroom + "', '" + studentsList + "')");
+                classesDAO.createClass(organization, classroom, studentsList);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

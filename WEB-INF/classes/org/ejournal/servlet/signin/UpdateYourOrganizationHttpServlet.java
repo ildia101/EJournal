@@ -5,27 +5,33 @@ import java.sql.*;
 import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.UsersDAO;
 
 public class UpdateYourOrganizationHttpServlet extends HttpServlet {
+    private UsersDAO usersDAO;
+
+    public UpdateYourOrganizationHttpServlet() throws SQLException {
+        this.usersDAO = new UsersDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement)session.getAttribute("DBAccess");
 
         String code = request.getParameter("code");
         boolean RealOrganization = false;
 
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT organization FROM users;");
-            while (resultSet.next()){
-                if(Objects.equals(resultSet.getString("organization"), code)){
+            String allOrganizations[] = usersDAO.getAllOrganizations();
+            for (int i = 0; i < allOrganizations.length; i++) {
+                if(Objects.equals(allOrganizations[i], code)){
                     RealOrganization = true;
                     break;
                 }
             }
 
             if(RealOrganization){
-                statement.executeUpdate("UPDATE users SET organization = \"" + code + "\" WHERE email = \"" + session.getAttribute("Email") + "\" AND organization = \"null\";");
+                usersDAO.updateUserOrganization((String) session.getAttribute("Email"), code, "null");
                 session.setAttribute("Organization", code);
 
                 session.removeAttribute("Email");

@@ -2,17 +2,21 @@ package org.ejournal.servlet.menu.reportcard;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Objects;
 
 public class GetStudentsHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+
+    public GetStudentsHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
         String classroom = request.getParameter("classroom");
         if (Objects.equals(classroom, "-")) {
@@ -21,12 +25,9 @@ public class GetStudentsHttpServlet extends HttpServlet {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("ReportCard/ChooseClass.jsp");
             requestDispatcher.forward(request, response);
         } else {
-            String students[] = null;
-
+            String students[];
             try {
-                ResultSet DBSearch = statement.executeQuery("SELECT students FROM classes WHERE classroom LIKE \"" + classroom + "\" AND organization LIKE \"" + session.getAttribute("Organization") + "\";");
-                DBSearch.next();
-                students = DBSearch.getString("students").split(", ");
+                students = classesDAO.getClassStudents((String) session.getAttribute("Organization"), classroom);
             } catch (SQLException sqlException) {
                 throw new RuntimeException(sqlException);
             }

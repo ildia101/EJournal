@@ -3,40 +3,40 @@ package org.ejournal.servlet.menu.addinformation.deleteinformation;
 import java.io.*;
 import java.sql.*;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.stream.Stream;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.SubjectsDAO;
 
 public class GetClassesAndSubjectsHttpServlet extends HttpServlet {
+    private ClassesDAO classesDAO;
+    private SubjectsDAO subjectsDAO;
+
+    public GetClassesAndSubjectsHttpServlet() throws SQLException {
+        this.classesDAO = new ClassesDAO();
+        this.subjectsDAO = new SubjectsDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
-        ArrayList<String> classes = new ArrayList<>();
-        ArrayList<String> subjects = new ArrayList<>();
+        String classesList[];
+        String subjectsList[];
 
-        ResultSet resultSet;
         try {
-            resultSet = statement.executeQuery("SELECT classroom FROM classes WHERE organization LIKE \"" + session.getAttribute("Organization") +"\";");
-            while (resultSet.next()){
-                classes.add(resultSet.getString("classroom"));
-            }
+            classesList = classesDAO.getClassesOfThisOrganization((String) session.getAttribute("Organization"));
 
-            resultSet = statement.executeQuery("SELECT subject FROM subjects WHERE organization LIKE \"" + session.getAttribute("Organization") +"\";");
-            while (resultSet.next()){
-                subjects.add(resultSet.getString("subject"));
-            }
-
+            subjectsList = subjectsDAO.getSubjectsOfThisOrganization((String) session.getAttribute("Organization"));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-        Stream<String> str = Stream.of(classes.toArray(new String[0])).sorted(collator);
-        String classesList[] = str.toArray(String[]::new);
+        Stream<String> str = Stream.of(classesList).sorted(collator);
+        classesList = str.toArray(String[]::new);
         for (int i = 0; i < classesList.length - 1; i++) {
             for(int j = 0; j < classesList.length - i - 1; j++) {
                 if(Integer.parseInt(classesList[j + 1].split("-")[0]) < Integer.parseInt(classesList[j].split("-")[0])){
@@ -47,8 +47,8 @@ public class GetClassesAndSubjectsHttpServlet extends HttpServlet {
             }
         }
 
-        str = Stream.of(subjects.toArray(new String[0])).sorted(collator);
-        String subjectsList[] = str.toArray(String[]::new);
+        str = Stream.of(subjectsList).sorted(collator);
+        subjectsList = str.toArray(String[]::new);
 
         session.setAttribute("Classes", classesList);
         session.setAttribute("Subjects", subjectsList);

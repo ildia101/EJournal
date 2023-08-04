@@ -6,8 +6,16 @@ import java.util.HashMap;
 import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.entities.UserEntity;
 
 public class LoginAndRegisterHttpServlet extends HttpServlet{
+    private UsersDAO usersDAO;
+
+    public LoginAndRegisterHttpServlet() throws SQLException, ServletException, IOException {
+        this.usersDAO = new UsersDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         HttpSession session = request.getSession();
@@ -21,11 +29,6 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
         savedInfo.put("Email", email);
 
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal", "root", "root");
-            Statement statement = connection.createStatement();
-
-            session.setAttribute("DBAccess", statement);
-
             if(Objects.equals(process, "registration")){
                 String role = request.getParameter("role");
 
@@ -50,7 +53,7 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
                             code.append(chars.charAt((int) (Math.random() * 62)));
                         }
 
-                        statement.executeUpdate("INSERT INTO users VALUES('" + code + "', '" + role + "', '" + name + "', '" + email + "', '" + password + "')");
+                        usersDAO.createUser(String.valueOf(code), role, name, email, password);
 
                         request.setAttribute("Code", code);
 
@@ -69,31 +72,27 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
                     }
                 }
             } else if(Objects.equals(process, "login")){
-                ResultSet result = statement.executeQuery("SELECT password FROM users WHERE email LIKE \"" + email + "\";");
-                result.next();
-                if(result.getRow()!=0){
-                    if(Objects.equals(result.getString("password"), password)){
+                UserEntity user = usersDAO.getUser(email);
+                if(user!=null) {
+                    if (Objects.equals(user.getPassword(), password)) {
                         session.setAttribute("LoggedIn", true);
 
-                        ResultSet DBSearch = statement.executeQuery("SELECT role FROM users WHERE email LIKE \"" + email + "\";");
-                        DBSearch.next();
-                        session.setAttribute("Role", DBSearch.getString("role"));
+                        session.setAttribute("Role", user.getRole());
 
                         session.setAttribute("Principal", "principal");
                         session.setAttribute("Tutor", "tutor");
                         session.setAttribute("Teacher", "teacher");
 
-                        DBSearch = statement.executeQuery("SELECT organization FROM users WHERE email LIKE \"" + email + "\";");
-                        DBSearch.next();
-                        String org = DBSearch.getString("organization");
-                        if(Objects.equals(org, "null")){
+
+                        String org = user.getOrganization();
+                        if (Objects.equals(org, "null")) {
                             request.setAttribute("EnterCodePage", true);
                             session.setAttribute("Email", email);
 
                             RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
                             requestDispatcher.forward(request, response);
                         } else {
-                            session.setAttribute("Organization", DBSearch.getString("organization"));
+                            session.setAttribute("Organization", org);
                             RequestDispatcher requestDispatcher = request.getRequestDispatcher("UserInSystem.jsp");
                             requestDispatcher.forward(request, response);
                         }
@@ -112,7 +111,7 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
         }
-    }
+}
 
     private static void returnError(HttpServletRequest request, HttpServletResponse response, HashMap<String, String> info) throws ServletException, IOException {
         RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");

@@ -3,16 +3,23 @@ package org.ejournal.servlet.menu.addinformation.addgrades;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.ejournal.dao.MarksDAO;
+import org.ejournal.dao.entities.MarksEntity;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class SaveGradesHttpServlet extends HttpServlet {
+    private MarksDAO marksDAO;
+
+    public SaveGradesHttpServlet() throws SQLException {
+        this.marksDAO = new MarksDAO();
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Statement statement = (Statement) session.getAttribute("DBAccess");
 
         boolean addToDB = true;
         String errorMSG = null;
@@ -80,20 +87,21 @@ public class SaveGradesHttpServlet extends HttpServlet {
             try {
                 boolean infoAlreadyExist = false;
 
-                ResultSet checkForInfo = statement.executeQuery("SELECT dates FROM marks WHERE organization LIKE \"" + organization + "\" AND classroom LIKE \"" + classroom + "\" AND subject LIKE \"" + subject + "\" AND page LIKE \"" + page + "\";");
-                if(checkForInfo.next()){
-                    statement.executeUpdate("UPDATE marks SET dates = \"" + datesList + "\" WHERE organization = \"" + organization + "\" AND classroom = \"" + classroom + "\" AND subject = \"" + subject + "\" AND page = \"" + page + "\";");
-                    infoAlreadyExist = true;
-                }
+                MarksEntity marksInfo = marksDAO.getMarks(organization, classroom, subject, page, (int)session.getAttribute("NumberOfStudents"));
+                if(marksInfo!=null) {
+                    if (marksInfo.getDates() != null) {
+                        marksDAO.updateDates(organization, classroom, subject, page, datesList);
+                        infoAlreadyExist = true;
+                    }
 
-                checkForInfo = statement.executeQuery("SELECT marks FROM marks WHERE organization LIKE \"" + organization + "\" AND classroom LIKE \"" + classroom + "\" AND subject LIKE \"" + subject + "\" AND page LIKE \"" + page + "\";");
-                if(checkForInfo.next()){
-                    statement.executeUpdate("UPDATE marks SET marks = \"" + marksList + "\" WHERE organization = \"" + organization + "\" AND classroom = \"" + classroom + "\" AND subject = \"" + subject + "\" AND page = \"" + page + "\";");
-                    infoAlreadyExist = true;
+                    if (marksInfo.getMarks() != null) {
+                        marksDAO.updateMarks(organization, classroom, subject, page, marksList);
+                        infoAlreadyExist = true;
+                    }
                 }
 
                 if(!infoAlreadyExist) {
-                    statement.executeUpdate("INSERT INTO marks(organization, classroom, subject, page, dates, marks) VALUES('" + organization + "', '" + classroom + "', '" + subject + "', '" + page + "', '" + datesList + "', '" + marksList + "')");
+                    marksDAO.addInformation(organization, classroom, subject, page, datesList, marksList);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
