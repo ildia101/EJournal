@@ -19,9 +19,9 @@
       <form method="POST" action="UpdatedClassroom">
         <p class="input-background">
           <span class="text">Укажіть ПІБ учнів: </span>
-          <c:forEach items="${requestScope.StudentsFromThisClass}" var="ThisStundent" varStatus="loop">
+          <c:forEach items="${sessionScope.StudentsFromThisClass}" var="ThisStudent" varStatus="loop">
             <span class="new-line"></span>
-            <input type="text" name="student${loop.index}" value="${ThisStundent}" size="100"/>
+            <input type="text" name="student${loop.index}" value="${ThisStudent.lastName} ${ThisStudent.firstName} ${ThisStudent.middleName}" size="100"/>
           </c:forEach>
         </p>
 

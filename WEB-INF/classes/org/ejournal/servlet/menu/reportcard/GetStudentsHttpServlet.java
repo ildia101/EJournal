@@ -2,16 +2,24 @@ package org.ejournal.servlet.menu.reportcard;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.ClassDAO;
+import org.ejournal.dao.ClassStudentDAO;
+import org.ejournal.dao.StudentDAO;
+import org.ejournal.dao.entities.StudentEntity;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public class GetStudentsHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
+    private ClassDAO classDAO;
+    private ClassStudentDAO classStudentDAO;
+    private StudentDAO studentDAO;;
 
-    public GetStudentsHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
+    public GetStudentsHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.classStudentDAO = new ClassStudentDAO();
+        this.studentDAO = new StudentDAO();
     }
 
     @Override
@@ -25,9 +33,11 @@ public class GetStudentsHttpServlet extends HttpServlet {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("ReportCard/ChooseClass.jsp");
             requestDispatcher.forward(request, response);
         } else {
-            String students[];
+            StudentEntity students[];
             try {
-                students = classesDAO.getClassStudents((String) session.getAttribute("Organization"), classroom);
+                int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(classroom);
+                Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
+                students = studentDAO.getStudentsByIdAsArray(studentIDs);
             } catch (SQLException sqlException) {
                 throw new RuntimeException(sqlException);
             }

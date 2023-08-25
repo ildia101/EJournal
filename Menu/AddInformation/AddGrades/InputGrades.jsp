@@ -25,44 +25,44 @@
           <table>
             <tr>
               <td></td>
-              <td><input type="text" name="date0" value="${Dates[0]}" size="4"/></td>
-              <td><input type="text" name="date1" value="${Dates[1]}" size="4"/></td>
-              <td><input type="text" name="date2" value="${Dates[2]}" size="4"/></td>
-              <td><input type="text" name="date3" value="${Dates[3]}" size="4"/></td>
-              <td><input type="text" name="date4" value="${Dates[4]}" size="4"/></td>
-              <td><input type="text" name="date5" value="${Dates[5]}" size="4"/></td>
-              <td><input type="text" name="date6" value="${Dates[6]}" size="4"/></td>
-              <td><input type="text" name="date7" value="${Dates[7]}" size="4"/></td>
-              <td><input type="text" name="date8" value="${Dates[8]}" size="4"/></td>
-              <td><input type="text" name="date9" value="${Dates[9]}" size="4"/></td>
-              <td><input type="text" name="date10" value="${Dates[10]}" size="4"/></td>
-              <td><input type="text" name="date11" value="${Dates[11]}" size="4"/></td>
-              <td><input type="text" name="date12" value="${Dates[12]}" size="4"/></td>
-              <td><input type="text" name="date13" value="${Dates[13]}" size="4"/></td>
-              <td><input type="text" name="date14" value="${Dates[14]}" size="4"/></td>
-              <td><input type="text" name="date15" value="${Dates[15]}" size="4"/></td>
-              <td><input type="text" name="date16" value="${Dates[16]}" size="4"/></td>
+              <td><input type="text" name="date0" value="${sessionScope.Marks[0].date}" size="4"/></td>
+              <td><input type="text" name="date1" value="${sessionScope.Marks[1].date}" size="4"/></td>
+              <td><input type="text" name="date2" value="${sessionScope.Marks[2].date}" size="4"/></td>
+              <td><input type="text" name="date3" value="${sessionScope.Marks[3].date}" size="4"/></td>
+              <td><input type="text" name="date4" value="${sessionScope.Marks[4].date}" size="4"/></td>
+              <td><input type="text" name="date5" value="${sessionScope.Marks[5].date}" size="4"/></td>
+              <td><input type="text" name="date6" value="${sessionScope.Marks[6].date}" size="4"/></td>
+              <td><input type="text" name="date7" value="${sessionScope.Marks[7].date}" size="4"/></td>
+              <td><input type="text" name="date8" value="${sessionScope.Marks[8].date}" size="4"/></td>
+              <td><input type="text" name="date9" value="${sessionScope.Marks[9].date}" size="4"/></td>
+              <td><input type="text" name="date10" value="${sessionScope.Marks[10].date}" size="4"/></td>
+              <td><input type="text" name="date11" value="${sessionScope.Marks[11].date}" size="4"/></td>
+              <td><input type="text" name="date12" value="${sessionScope.Marks[12].date}" size="4"/></td>
+              <td><input type="text" name="date13" value="${sessionScope.Marks[13].date}" size="4"/></td>
+              <td><input type="text" name="date14" value="${sessionScope.Marks[14].date}" size="4"/></td>
+              <td><input type="text" name="date15" value="${sessionScope.Marks[15].date}" size="4"/></td>
+              <td><input type="text" name="date16" value="${sessionScope.Marks[16].date}" size="4"/></td>
             </tr>
-            <c:forEach items="${sessionScope.StudentsFromThisClass}" var="ThisStundent" varStatus="loop">
+            <c:forEach items="${sessionScope.StudentsFromThisClass}" var="ThisStudent" varStatus="loop">
               <tr>
-                <td><p>${ThisStundent}</p></td>
-                <td><input type="text" name="grade${loop.index}0" value="${Marks[loop.index][0]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}1" value="${Marks[loop.index][1]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}2" value="${Marks[loop.index][2]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}3" value="${Marks[loop.index][3]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}4" value="${Marks[loop.index][4]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}5" value="${Marks[loop.index][5]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}6" value="${Marks[loop.index][6]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}7" value="${Marks[loop.index][7]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}8" value="${Marks[loop.index][8]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}9" value="${Marks[loop.index][9]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}10" value="${Marks[loop.index][10]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}11" value="${Marks[loop.index][11]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}12" value="${Marks[loop.index][12]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}13" value="${Marks[loop.index][13]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}14" value="${Marks[loop.index][14]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}15" value="${Marks[loop.index][15]}" size="4"/></td>
-                <td><input type="text" name="grade${loop.index}16" value="${Marks[loop.index][16]}" size="4"/></td>
+                <td><p>${ThisStudent.lastName} ${ThisStudent.firstName} ${ThisStudent.middleName}</p></td>
+                <td><input type="text" name="grade${loop.index}0" value="${sessionScope.Marks[0+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}1" value="${sessionScope.Marks[1+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}2" value="${sessionScope.Marks[2+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}3" value="${sessionScope.Marks[3+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}4" value="${sessionScope.Marks[4+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}5" value="${sessionScope.Marks[5+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}6" value="${sessionScope.Marks[6+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}7" value="${sessionScope.Marks[7+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}8" value="${sessionScope.Marks[8+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}9" value="${sessionScope.Marks[9+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}10" value="${sessionScope.Marks[10+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}11" value="${sessionScope.Marks[11+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}12" value="${sessionScope.Marks[12+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}13" value="${sessionScope.Marks[13+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}14" value="${sessionScope.Marks[14+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}15" value="${sessionScope.Marks[15+17*loop.index].mark}" size="4"/></td>
+                <td><input type="text" name="grade${loop.index}16" value="${sessionScope.Marks[16+17*loop.index].mark}" size="4"/></td>
               </tr>
             </c:forEach>
           </table>

@@ -1,22 +1,28 @@
 package org.ejournal.dao.entities;
 
 public class UserEntity {
-    private String organization;
+    private int id;
+    private int organizationId;
     private String role;
     private String name;
     private String email;
     private String password;
 
-    public UserEntity(String organization, String role, String name, String email, String password) {
-        this.organization = organization;
+    public UserEntity(int id, int organizationId, String role, String name, String email, String password) {
+        this.id = id;
+        this.organizationId = organizationId;
         this.role = role;
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public String getOrganization() {
-        return organization;
+    public int getId() {
+        return id;
+    }
+
+    public int getOrganizationId() {
+        return organizationId;
     }
 
     public String getRole() {

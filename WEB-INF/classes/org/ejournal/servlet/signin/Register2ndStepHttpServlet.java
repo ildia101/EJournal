@@ -2,16 +2,18 @@ package org.ejournal.servlet.signin;
 
 import java.io.*;
 import java.sql.*;
-import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.OrganizationDAO;
+import org.ejournal.dao.UserDAO;
 
 public class Register2ndStepHttpServlet extends HttpServlet {
-    private UsersDAO usersDAO;
+    private OrganizationDAO organizationDAO;
+    private UserDAO userDAO;
 
-    public Register2ndStepHttpServlet() throws SQLException {
-        this.usersDAO = new UsersDAO();
+    public Register2ndStepHttpServlet() {
+        this.organizationDAO = new OrganizationDAO();
+        this.userDAO = new UserDAO();
     }
 
     @Override
@@ -19,25 +21,17 @@ public class Register2ndStepHttpServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         String code = request.getParameter("code");
-        boolean RealOrganization = false;
 
         try {
-            String allOrganizations[] = usersDAO.getAllOrganizations();
-            for (int i = 0; i < allOrganizations.length; i++) {
-                if(Objects.equals(allOrganizations[i], code)){
-                    RealOrganization = true;
-                    break;
-                }
-            }
-
-            if(RealOrganization){
+            int organizationID = organizationDAO.getOrganizationIdByName(code);
+            if(organizationID!=-1){
                 try {
                     String role = (String)session.getAttribute("Role");
                     String name = (String)session.getAttribute("Name");
                     String email = (String)session.getAttribute("Email");
                     String password = (String)session.getAttribute("Password");
 
-                    usersDAO.createUser(code, role, name, email, password);
+                    userDAO.createUser(organizationID, role, name, email, password);
 
                     session.removeAttribute("Role");
                     session.removeAttribute("Name");

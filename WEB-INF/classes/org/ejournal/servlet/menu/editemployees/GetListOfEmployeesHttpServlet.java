@@ -3,19 +3,17 @@ package org.ejournal.servlet.menu.editemployees;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.UserDAO;
 import org.ejournal.dao.entities.UserEntity;
 import java.io.IOException;
 import java.sql.*;
-import java.text.Collator;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class GetListOfEmployeesHttpServlet extends HttpServlet {
-    private UsersDAO usersDAO;
+    private UserDAO userDAO;
 
-    public GetListOfEmployeesHttpServlet() throws SQLException {
-        this.usersDAO = new UsersDAO();
+    public GetListOfEmployeesHttpServlet() {
+        this.userDAO = new UserDAO();
     }
 
     @Override
@@ -28,7 +26,7 @@ public class GetListOfEmployeesHttpServlet extends HttpServlet {
         ArrayList<String> listOfPrincipals = new ArrayList<>();
 
         try {
-            employees = usersDAO.getEmployees((String) session.getAttribute("Organization"));
+            employees = new ArrayList<>(Arrays.asList(userDAO.getEmployees((int) session.getAttribute("Organization"))));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -43,18 +41,12 @@ public class GetListOfEmployeesHttpServlet extends HttpServlet {
             }
         }
 
-        Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-        Stream<String> str = Stream.of(listOfEmployees.toArray(new String[0])).sorted(collator);
-        listOfEmployees = new ArrayList<>(Arrays.asList(str.toArray(String[]::new)));
-        
-        str = Stream.of(listOfPrincipals.toArray(new String[0])).sorted(collator);
-        listOfPrincipals = new ArrayList<>(Arrays.asList(str.toArray(String[]::new)));
-
         for (int i = listOfPrincipals.size()-1; i>=0; i--) {
             listOfEmployees.add(0, listOfPrincipals.get(i));
             listOfRoles.add(0, "principal");
         }
 
+        session.setAttribute("Employees", employees);
         request.setAttribute("ListOfEmployees", listOfEmployees);
         request.setAttribute("ListOfRoles", listOfRoles);
 

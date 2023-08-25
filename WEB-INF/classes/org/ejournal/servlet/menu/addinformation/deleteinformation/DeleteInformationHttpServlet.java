@@ -2,9 +2,7 @@ package org.ejournal.servlet.menu.addinformation.deleteinformation;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
-import org.ejournal.dao.MarksDAO;
-import org.ejournal.dao.SubjectsDAO;
+import org.ejournal.dao.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,14 +10,18 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class DeleteInformationHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
-    private SubjectsDAO subjectsDAO;
-    private MarksDAO marksDAO;
+    private ClassDAO classDAO;
+    private ClassStudentDAO classStudentDAO;
+    private StudentDAO studentDAO;
+    private SubjectDAO subjectDAO;
+    private MarkDAO markDAO;
 
-    public DeleteInformationHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
-        this.subjectsDAO = new SubjectsDAO();
-        this.marksDAO = new MarksDAO();
+    public DeleteInformationHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.classStudentDAO = new ClassStudentDAO();
+        this.studentDAO = new StudentDAO();
+        this.subjectDAO = new SubjectDAO();
+        this.markDAO = new MarkDAO();
     }
 
     @Override
@@ -38,8 +40,19 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteClass/ChooseClass.jsp", request, response);
 
                 try {
-                    classesDAO.deleteClassroom((String) session.getAttribute("Organization"), objectToDelete);
-                    marksDAO.deleteClassroomMarks((String) session.getAttribute("Organization"), objectToDelete);
+                    int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+                    Integer studentsIDs[] = classStudentDAO.getAllStudentIDs(classID);
+
+                    classDAO.deleteClassByID(classID);
+
+                    for (int i = 0; i < studentsIDs.length; i++) {
+                        int classStudentID = classStudentDAO.getID(classID, studentsIDs[i]);
+                        markDAO.deleteStudentMarksByClassStudentID(classStudentID);
+
+                        studentDAO.deleteStudentByID(studentsIDs[i]);
+                    }
+
+                    classStudentDAO.deleteInfoByClassID(classID);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -54,8 +67,10 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteSubject/ChooseSubject.jsp", request, response);
 
                 try {
-                    subjectsDAO.deleteSubject((String) session.getAttribute("Organization"), objectToDelete);
-                    marksDAO.deleteSubjectMarks((String) session.getAttribute("Organization"), objectToDelete);
+                    int subjectID = subjectDAO.getSubjectIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+
+                    subjectDAO.deleteSubjectByID(subjectID);
+                    markDAO.deleteStudentMarksBySubjectID(subjectID);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -70,7 +85,13 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteMarks/ChooseClass.jsp", request, response);
 
                 try {
-                    marksDAO.deleteClassroomMarks((String) session.getAttribute("Organization"), objectToDelete);
+                    int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+                    Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
+
+                    for (int i = 0; i < studentIDs.length; i++) {
+                        int classStudentID = classStudentDAO.getID(classID, studentIDs[i]);
+                        markDAO.deleteStudentMarksByClassStudentID(classStudentID);
+                    }
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

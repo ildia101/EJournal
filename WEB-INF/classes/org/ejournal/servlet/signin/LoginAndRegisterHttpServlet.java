@@ -6,14 +6,17 @@ import java.util.HashMap;
 import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.OrganizationDAO;
+import org.ejournal.dao.UserDAO;
 import org.ejournal.dao.entities.UserEntity;
 
 public class LoginAndRegisterHttpServlet extends HttpServlet{
-    private UsersDAO usersDAO;
+    private OrganizationDAO organizationDAO;
+    private UserDAO userDAO;
 
-    public LoginAndRegisterHttpServlet() throws SQLException, ServletException, IOException {
-        this.usersDAO = new UsersDAO();
+    public LoginAndRegisterHttpServlet() {
+        this.organizationDAO = new OrganizationDAO();
+        this.userDAO = new UserDAO();
     }
 
     @Override
@@ -53,7 +56,9 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
                             code.append(chars.charAt((int) (Math.random() * 62)));
                         }
 
-                        usersDAO.createUser(String.valueOf(code), role, name, email, password);
+                        organizationDAO.createOrganization(code.toString());
+                        int organizationID = organizationDAO.getOrganizationIdByName(code.toString());
+                        userDAO.createUser(organizationID, role, name, email, password);
 
                         request.setAttribute("Code", code);
 
@@ -72,7 +77,7 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
                     }
                 }
             } else if(Objects.equals(process, "login")){
-                UserEntity user = usersDAO.getUser(email);
+                UserEntity user = userDAO.getUser(email);
                 if(user!=null) {
                     if (Objects.equals(user.getPassword(), password)) {
                         session.setAttribute("LoggedIn", true);
@@ -84,15 +89,15 @@ public class LoginAndRegisterHttpServlet extends HttpServlet{
                         session.setAttribute("Teacher", "teacher");
 
 
-                        String org = user.getOrganization();
-                        if (Objects.equals(org, "null")) {
+                        int organization = user.getOrganizationId();
+                        if (organization == -1) {
                             request.setAttribute("EnterCodePage", true);
                             session.setAttribute("Email", email);
 
                             RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
                             requestDispatcher.forward(request, response);
                         } else {
-                            session.setAttribute("Organization", org);
+                            session.setAttribute("Organization", organization);
                             RequestDispatcher requestDispatcher = request.getRequestDispatcher("UserInSystem.jsp");
                             requestDispatcher.forward(request, response);
                         }

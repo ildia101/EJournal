@@ -3,17 +3,18 @@ package org.ejournal.servlet.menu.addinformation.editclassroom;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.StudentDAO;
+import org.ejournal.dao.entities.StudentEntity;
+
 import java.io.IOException;
 import java.sql.*;
-import java.util.Arrays;
 
 
 public class UpdateClassroomHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
+    private StudentDAO studentDAO;
 
-    public UpdateClassroomHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
+    public UpdateClassroomHttpServlet() {
+        this.studentDAO = new StudentDAO();
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -21,29 +22,26 @@ public class UpdateClassroomHttpServlet extends HttpServlet {
         
         boolean addToDB = true;
 
-        String organization = (String) session.getAttribute("Organization");
-        String classroom = (String) session.getAttribute("Classroom");
-        String students[] = new String[(int) session.getAttribute("LengthOfStudentsArray")];
+        StudentEntity students[] = (StudentEntity[]) session.getAttribute("StudentsFromThisClass");
 
         for (int i = 0; i < students.length; i++) {
             String thisStudent = request.getParameter("student" + i);
             if(thisStudent.isEmpty()) {
                 addToDB = false;
             }
-            students[i] = thisStudent;
         }
         
         if(addToDB) {
-            String studentsList = Arrays.toString(students).replace("'", "''").replace("[", "").replace("]", "");
-            
             try {
-                classesDAO.updateStudentsInClass(organization, classroom, studentsList);
+                for (int i = 0; i < students.length; i++) {
+                    String thisStudent = request.getParameter("student" + i);
+                    String fullName[] = thisStudent.split(" ");
+                    studentDAO.editStudent(students[i].getId(), fullName[1], fullName[0], fullName[2]);
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
 
-            session.removeAttribute("Classroom");
-            session.removeAttribute("LengthOfStudentsArray");
 
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditClassroom/UpdatedClassroom.html");
             requestDispatcher.forward(request, response);

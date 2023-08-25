@@ -3,23 +3,31 @@ package org.ejournal.servlet.menu.addinformation.editclassroom;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.ClassDAO;
+import org.ejournal.dao.ClassStudentDAO;
+import org.ejournal.dao.StudentDAO;
+import org.ejournal.dao.entities.StudentEntity;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 
 public class EditClassroomHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
+    private ClassDAO classDAO;
+    private StudentDAO studentDAO;
+    private ClassStudentDAO classStudentDAO;
 
-    public EditClassroomHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
+    public EditClassroomHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.studentDAO = new StudentDAO();
+        this.classStudentDAO = new ClassStudentDAO();
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
 
         String classroom = request.getParameter("classroom");
-        String students[];
+        StudentEntity students[];
 
         if(Objects.equals(classroom, "-")){
             request.setAttribute("Error", true);
@@ -28,17 +36,15 @@ public class EditClassroomHttpServlet extends HttpServlet {
             requestDispatcher.forward(request, response);
         } else {
 			try {
-				students = classesDAO.getClassStudents((String) session.getAttribute("Organization"), classroom);
+                int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(classroom);
+                Integer studentsID[] = classStudentDAO.getAllStudentIDs(classID);
+				students = studentDAO.getStudentsByIdAsArray(studentsID);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 
-			session.removeAttribute("Classes");
-        
-			session.setAttribute("Classroom", classroom);
-			session.setAttribute("LengthOfStudentsArray", students.length);
 	
-			request.setAttribute("StudentsFromThisClass", students);
+			session.setAttribute("StudentsFromThisClass", students);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditClassroom/EditClass.jsp");
 			requestDispatcher.forward(request, response);
 		}

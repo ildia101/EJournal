@@ -3,20 +3,28 @@ package org.ejournal.servlet.menu.addinformation.addgrades;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
-import org.ejournal.dao.MarksDAO;
-import org.ejournal.dao.entities.MarksEntity;
+import org.ejournal.dao.*;
+import org.ejournal.dao.entities.MarkEntity;
+import org.ejournal.dao.entities.StudentEntity;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class GetClassGradesHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
-    private MarksDAO marksDAO;
+    private ClassDAO classDAO;
+    private ClassStudentDAO classStudentDAO;
+    private StudentDAO studentDAO;
+    private SubjectDAO subjectDAO;
+    private MarkDAO markDAO;
 
-    public GetClassGradesHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
-        this.marksDAO = new MarksDAO();
+    public GetClassGradesHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.classStudentDAO = new ClassStudentDAO();
+        this.studentDAO = new StudentDAO();
+        this.subjectDAO = new SubjectDAO();
+        this.markDAO = new MarkDAO();
     }
 
     @Override
@@ -32,8 +40,9 @@ public class GetClassGradesHttpServlet extends HttpServlet {
             }
         } catch (NullPointerException nullPointerException){
             HttpSession session = request.getSession();
+            int organization = (int) session.getAttribute("Organization");
 
-            String classroom = (String) session.getAttribute("Classroom");;
+            String classroom = (String) session.getAttribute("Classroom");
             if(classroom==null){
                 classroom = request.getParameter("classroom");
             }
@@ -41,7 +50,7 @@ public class GetClassGradesHttpServlet extends HttpServlet {
             if(subject==null){
                 subject = request.getParameter("subject");
             }
-            String students[];
+            StudentEntity students[];
             int numberOfPage = (int) session.getAttribute("NumberOfPage");
 
             if (Objects.equals(classroom, "-")) {
@@ -55,37 +64,45 @@ public class GetClassGradesHttpServlet extends HttpServlet {
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/ChooseClassAndSubject.jsp");
                 requestDispatcher.forward(request, response);
             } else {
-				try {
-					students = classesDAO.getClassStudents((String) session.getAttribute("Organization"), classroom);
-				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
-				}
+                int classID;
+                try {
+                    classID = classDAO.getClassIDs(organization).get(classroom);
+                    Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
+                    students = studentDAO.getStudentsByIdAsArray(studentIDs);
+                } catch (SQLException sqlException) {
+                    throw new RuntimeException(sqlException);
+                }
 
-				session.setAttribute("StudentsFromThisClass", students);
+                session.setAttribute("StudentsFromThisClass", students);
 
 
-				String dates[] = new String[0];
-				String marks[][] = new String[0][0];
-				try {
-					MarksEntity marksInfo = marksDAO.getMarks((String) session.getAttribute("Organization"), classroom, subject, numberOfPage, students.length);
-					
-					if(marksInfo!=null) {
-						dates = marksInfo.getDates();
-						marks = marksInfo.getMarks();
-					}
-				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
-				}
+                ArrayList<MarkEntity> requiredMarks = new ArrayList<>();
+                for (int i = 0; i < students.length; i++) {
+                    try {
+                        MarkEntity alreadyExistingMarks[] = markDAO.getSubjectMarks(classStudentDAO.getID(classID, students[i].getId()), subjectDAO.getSubjectIDs(organization).get(subject));
+                        requiredMarks.addAll(Arrays.asList(Arrays.copyOfRange(alreadyExistingMarks, 17 * (numberOfPage - 1), 17 * numberOfPage)));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        break;
+                    }
+                }
 
-				session.setAttribute("Dates", dates);
-				session.setAttribute("Marks", marks);
+                for (int i = 0; i < requiredMarks.size(); i++) {
+                    if(requiredMarks.get(i)==null){
+                        requiredMarks.clear();
+                        break;
+                    }
+                }
 
-				session.setAttribute("Classroom", classroom);
-				session.setAttribute("Subject", subject);
-				session.setAttribute("NumberOfStudents", students.length);
-				RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/InputGrades.jsp");
-				requestDispatcher.forward(request, response);
-			}
+                session.setAttribute("Marks", requiredMarks.toArray(new MarkEntity[0]));
+
+                session.setAttribute("Classroom", classroom);
+                session.setAttribute("Subject", subject);
+
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/InputGrades.jsp");
+                requestDispatcher.forward(request, response);
+            }
         }
     }
 }

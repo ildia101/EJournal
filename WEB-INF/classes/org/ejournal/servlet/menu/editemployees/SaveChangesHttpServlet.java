@@ -3,7 +3,7 @@ package org.ejournal.servlet.menu.editemployees;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.UserDAO;
 import org.ejournal.dao.entities.UserEntity;
 import java.io.IOException;
 import java.sql.*;
@@ -11,21 +11,16 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SaveChangesHttpServlet extends HttpServlet {
-    private UsersDAO usersDAO;
+    private UserDAO userDAO;
 
-    public SaveChangesHttpServlet() throws SQLException {
-        this.usersDAO = new UsersDAO();
+    public SaveChangesHttpServlet() {
+        this.userDAO = new UserDAO();
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        ArrayList<UserEntity> employees = null;
-        try {
-            employees = usersDAO.getEmployees((String) session.getAttribute("Organization"));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        ArrayList<UserEntity> employees = (ArrayList<UserEntity>) session.getAttribute("Employees");
 
         if (request.getParameter("SaveChanges") != null) {
             boolean changeRoleOfThisEmployee;
@@ -61,7 +56,7 @@ public class SaveChangesHttpServlet extends HttpServlet {
 
                 if (changeRoleOfThisEmployee) {
                     try {
-                        usersDAO.updateUserRole((String) session.getAttribute("Organization"), request.getParameter("employee" + i), request.getParameter("JobTitle" + i));
+                        userDAO.updateUserRole(thisEmployee.getEmail(), request.getParameter("JobTitle" + i));
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
@@ -115,7 +110,7 @@ public class SaveChangesHttpServlet extends HttpServlet {
                             UserEntity employee = employees.get(j);
                             if(Objects.equals(employee.getName(), request.getParameter("employee" + i))){
                                 try {
-                                    usersDAO.updateUserOrganization(employee.getEmail(), "null", (String) session.getAttribute("Organization"));
+                                    userDAO.updateUserOrganization(employee.getEmail(), -1);
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);
                                 }

@@ -2,16 +2,18 @@ package org.ejournal.servlet.signin;
 
 import java.io.*;
 import java.sql.*;
-import java.util.Objects;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.UsersDAO;
+import org.ejournal.dao.OrganizationDAO;
+import org.ejournal.dao.UserDAO;
 
 public class UpdateYourOrganizationHttpServlet extends HttpServlet {
-    private UsersDAO usersDAO;
+    private OrganizationDAO organizationDAO;
+    private UserDAO userDAO;
 
-    public UpdateYourOrganizationHttpServlet() throws SQLException {
-        this.usersDAO = new UsersDAO();
+    public UpdateYourOrganizationHttpServlet() {
+        this.organizationDAO = new OrganizationDAO();
+        this.userDAO = new UserDAO();
     }
 
     @Override
@@ -19,20 +21,12 @@ public class UpdateYourOrganizationHttpServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         String code = request.getParameter("code");
-        boolean RealOrganization = false;
 
         try {
-            String allOrganizations[] = usersDAO.getAllOrganizations();
-            for (int i = 0; i < allOrganizations.length; i++) {
-                if(Objects.equals(allOrganizations[i], code)){
-                    RealOrganization = true;
-                    break;
-                }
-            }
-
-            if(RealOrganization){
-                usersDAO.updateUserOrganization((String) session.getAttribute("Email"), code, "null");
-                session.setAttribute("Organization", code);
+            int organizationID = organizationDAO.getOrganizationIdByName(code);
+            if(organizationID!=-1){
+                userDAO.updateUserOrganization((String) session.getAttribute("Email"), organizationID);
+                session.setAttribute("Organization", organizationID);
 
                 session.removeAttribute("Email");
 

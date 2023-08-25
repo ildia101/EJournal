@@ -3,16 +3,16 @@ package org.ejournal.servlet.menu.createclassroom;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.ClassDAO;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 
 public class GetAListOfStudentsHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
+    private ClassDAO classDAO;
 
-    public GetAListOfStudentsHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
+    public GetAListOfStudentsHttpServlet() {
+        this.classDAO = new ClassDAO();
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,7 +49,7 @@ public class GetAListOfStudentsHttpServlet extends HttpServlet {
 			String classroom = number + "-" + letter;
 		
 			try {
-				String classes[] = classesDAO.getClassesOfThisOrganization((String) session.getAttribute("Organization"));
+				String classes[] = classDAO.getClassNames((int) session.getAttribute("Organization"));
 				for (int i = 0; i < classes.length; i++) {
 					if(Objects.equals(classes[i], classroom)){
 						request.setAttribute("Error", true);
@@ -61,7 +61,7 @@ public class GetAListOfStudentsHttpServlet extends HttpServlet {
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
-		
+
 			String students[] = new String[numberOfStudents];
 
 			session.setAttribute("Classroom", classroom);

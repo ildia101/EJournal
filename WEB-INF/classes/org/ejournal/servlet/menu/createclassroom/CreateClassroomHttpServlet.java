@@ -1,20 +1,22 @@
 package org.ejournal.servlet.menu.createclassroom;
 
 import java.sql.*;
-import java.util.Arrays;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.ClassesDAO;
+import org.ejournal.dao.ClassDAO;
+import org.ejournal.dao.ClassStudentDAO;
+import org.ejournal.dao.StudentDAO;
 import java.io.IOException;
-import java.text.Collator;
-import java.util.Locale;
-import java.util.stream.Stream;
 
 public class CreateClassroomHttpServlet extends HttpServlet {
-    private ClassesDAO classesDAO;
+    private ClassDAO classDAO;
+    private StudentDAO studentDAO;
+    private ClassStudentDAO classStudentDAO;
 
-    public CreateClassroomHttpServlet() throws SQLException {
-        this.classesDAO = new ClassesDAO();
+    public CreateClassroomHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.studentDAO = new StudentDAO();
+        this.classStudentDAO = new ClassStudentDAO();
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -22,7 +24,7 @@ public class CreateClassroomHttpServlet extends HttpServlet {
 
         boolean addToDB = true;
 
-        String organization = (String) session.getAttribute("Organization");
+        int organization = (int) session.getAttribute("Organization");
         String classroom = (String) session.getAttribute("Classroom");
         String students[] = (String[]) session.getAttribute("ListOfStudents");
 
@@ -35,13 +37,14 @@ public class CreateClassroomHttpServlet extends HttpServlet {
         }
 
         if(addToDB) {
-            Collator collator = Collator.getInstance(new Locale("uk", "UA"));
-            Stream<String> str = Stream.of(students).sorted(collator);
-            students = str.toArray(String[]::new);
-            String studentsList = Arrays.toString(students).replace("'", "''").replace("[", "").replace("]", "");
-
             try {
-                classesDAO.createClass(organization, classroom, studentsList);
+                int classID = classDAO.createClass(organization, classroom);
+
+                for (int i = 0; i < students.length; i++) {
+                    String fullNameOfThisStudent[] = students[i].split(" ");
+                    int thisStudentID = studentDAO.addStudent(fullNameOfThisStudent[1], fullNameOfThisStudent[0], fullNameOfThisStudent[2]);
+                    classStudentDAO.addStudentToClass(classID, thisStudentID);
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

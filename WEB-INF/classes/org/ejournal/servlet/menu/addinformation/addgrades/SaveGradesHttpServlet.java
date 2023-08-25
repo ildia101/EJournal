@@ -3,18 +3,26 @@ package org.ejournal.servlet.menu.addinformation.addgrades;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.MarksDAO;
-import org.ejournal.dao.entities.MarksEntity;
+import org.ejournal.dao.*;
+import org.ejournal.dao.entities.MarkEntity;
+import org.ejournal.dao.entities.StudentEntity;
 import java.io.IOException;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class SaveGradesHttpServlet extends HttpServlet {
-    private MarksDAO marksDAO;
+    private ClassDAO classDAO;
+    private ClassStudentDAO classStudentDAO;
+    private StudentDAO studentDAO;
+    private SubjectDAO subjectDAO;
+    private MarkDAO markDAO;
 
-    public SaveGradesHttpServlet() throws SQLException {
-        this.marksDAO = new MarksDAO();
+    public SaveGradesHttpServlet() {
+        this.classDAO = new ClassDAO();
+        this.classStudentDAO = new ClassStudentDAO();
+        this.studentDAO = new StudentDAO();
+        this.subjectDAO = new SubjectDAO();
+        this.markDAO = new MarkDAO();
     }
 
     @Override
@@ -24,27 +32,37 @@ public class SaveGradesHttpServlet extends HttpServlet {
         boolean addToDB = true;
         String errorMSG = null;
 
-        String organization = (String) session.getAttribute("Organization");
-        String classroom = (String) session.getAttribute("Classroom");
-        String subject = (String) session.getAttribute("Subject");
-        int page = (int) session.getAttribute("NumberOfPage");
+        int organization = (int) session.getAttribute("Organization");
+        int classroomID;
+        int subjectID;
+        try {
+            classroomID = classDAO.getClassIDs(organization).get((String)session.getAttribute("Classroom"));
+            subjectID = subjectDAO.getSubjectIDs(organization).get((String)session.getAttribute("Subject"));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        StudentEntity students[] = (StudentEntity[]) session.getAttribute("StudentsFromThisClass");
+
+        MarkEntity marks[] = (MarkEntity[]) session.getAttribute("MarksFromDB");
+        if(marks==null){
+            marks = (MarkEntity[]) session.getAttribute("Marks");
+        }
         String dates[] = new String[17];
-        String datesList;
-        String marks[][] = new String[(int)session.getAttribute("NumberOfStudents")][17];
-        String marksList;
+        String markValues[][] = new String[students.length][17];
 
         for (int i = 0; i < 17; i++) {
             String temp = request.getParameter("date" + i);
-            try{
+            try {
                 double num = Double.parseDouble(temp);
-                if(num<0.0){
+                if (num < 0.0) {
                     throw new NumberFormatException();
                 }
                 dates[i] = String.valueOf(num);
-            } catch (NumberFormatException e){
-                if(Objects.equals(temp, "Т") || Objects.equals(temp, "С") || Objects.equals(temp, "Р")) {
+            } catch (NumberFormatException e) {
+                if (Objects.equals(temp, "Т") || Objects.equals(temp, "С") || Objects.equals(temp, "Р")) {
                     dates[i] = temp;
-                } else if(temp.isEmpty()) {
+                } else if (temp.isEmpty()) {
                     dates[i] = null;
                 } else {
                     dates[i] = temp;
@@ -54,9 +72,7 @@ public class SaveGradesHttpServlet extends HttpServlet {
             }
         }
 
-        datesList = Arrays.toString(dates).replace("[", "").replace("]", "");
-
-        for (int i = 0; i < (int)session.getAttribute("NumberOfStudents"); i++) {
+        for (int i = 0; i < students.length; i++) {
             for (int j = 0; j < 17; j++) {
                 String temp = request.getParameter("grade" + i + "" + j);
                 try {
@@ -65,14 +81,14 @@ public class SaveGradesHttpServlet extends HttpServlet {
                         throw new NumberFormatException();
                     }
 
-                    marks[i][j] = String.valueOf(num);
-                } catch (NumberFormatException e){
-                    if(Objects.equals(temp, "Н") || Objects.equals(temp, "н")){
-                        marks[i][j] = temp;
-                    } else if(temp.isEmpty()) {
-                        marks[i][j] = null;
+                    markValues[i][j] = String.valueOf(num);
+                } catch (NumberFormatException e) {
+                    if (Objects.equals(temp, "Н") || Objects.equals(temp, "н")) {
+                        markValues[i][j] = temp;
+                    } else if (temp.isEmpty()) {
+                        markValues[i][j] = null;
                     } else {
-                        marks[i][j] = temp;
+                        markValues[i][j] = temp;
                         errorMSG = "Невірне значення у полях з оцінками";
                         addToDB = false;
                     }
@@ -80,49 +96,45 @@ public class SaveGradesHttpServlet extends HttpServlet {
             }
         }
 
-        marksList = Arrays.deepToString(marks);
-        marksList = marksList.substring(1, marksList.length()-1);
-
-        if(addToDB) {
-            try {
-                boolean infoAlreadyExist = false;
-
-                MarksEntity marksInfo = marksDAO.getMarks(organization, classroom, subject, page, (int)session.getAttribute("NumberOfStudents"));
-                if(marksInfo!=null) {
-                    if (marksInfo.getDates() != null) {
-                        marksDAO.updateDates(organization, classroom, subject, page, datesList);
-                        infoAlreadyExist = true;
-                    }
-
-                    if (marksInfo.getMarks() != null) {
-                        marksDAO.updateMarks(organization, classroom, subject, page, marksList);
-                        infoAlreadyExist = true;
+        if (addToDB) {
+            for (int i = 0; i < students.length; i++) {
+                for (int j = 0; j < 17; j++) {
+                    try {
+                        if (marks.length == 0) {
+                            int classStudentID = classStudentDAO.getID(classroomID, students[i].getId());
+                            markDAO.addMark(classStudentID, subjectID, dates[j], markValues[i][j]);
+                        } else {
+                            markDAO.updateMark(marks[j + (i * 17)].getId(), dates[j], markValues[i][j]);
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
                     }
                 }
-
-                if(!infoAlreadyExist) {
-                    marksDAO.addInformation(organization, classroom, subject, page, datesList, marksList);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
 
             session.removeAttribute("Classroom");
             session.removeAttribute("Subject");
+            session.removeAttribute("ClassroomID");
+            session.removeAttribute("SubjectID");
             session.removeAttribute("NumberOfPage");
-            session.removeAttribute("NumberOfStudents");
 
             session.removeAttribute("StudentsFromThisClass");
-            session.removeAttribute("NumberOfPage");
-
-            session.removeAttribute("Dates");
             session.removeAttribute("Marks");
+            session.removeAttribute("MarksFromDB");
 
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/AddedGrades.html");
             requestDispatcher.forward(request, response);
         } else {
-            session.setAttribute("Dates", dates);
-            session.setAttribute("Marks", marks);
+            MarkEntity savedMarks[] = new MarkEntity[students.length*17];
+
+            for (int i = 0; i < students.length; i++) {
+                for (int j = 0; j < 17; j++) {
+                    savedMarks[j+(i*17)] = new MarkEntity(0, dates[j], markValues[i][j]);
+                }
+            }
+
+            session.setAttribute("Marks", savedMarks);
+            session.setAttribute("MarksFromDB", marks);
 
             request.setAttribute("Error", true);
             request.setAttribute("InvalidData", errorMSG);

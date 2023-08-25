@@ -3,15 +3,15 @@ package org.ejournal.servlet.menu.addinformation.addsubject;
 import java.sql.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import org.ejournal.dao.SubjectsDAO;
+import org.ejournal.dao.SubjectDAO;
 import java.io.IOException;
 import java.util.Objects;
 
 public class AddSchoolSubjectHttpServlet extends HttpServlet {
-    private SubjectsDAO subjectsDAO;
+    private SubjectDAO subjectDAO;
 
-    public AddSchoolSubjectHttpServlet() throws SQLException {
-        this.subjectsDAO = new SubjectsDAO();
+    public AddSchoolSubjectHttpServlet() {
+        this.subjectDAO = new SubjectDAO();
     }
 
     @Override
@@ -19,7 +19,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
         boolean addNew = true;
 
         HttpSession session = request.getSession();
-        String organization = (String) session.getAttribute("Organization");
+        int organization = (int) session.getAttribute("Organization");
 
         String subject = request.getParameter("subject");
         String button = request.getParameter("button");
@@ -37,7 +37,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
                 requestDispatcher.forward(request, response);
             } else {
                 try {
-                    String alreadyExistingSubjects[] = subjectsDAO.getSubjectsOfThisOrganization(organization);
+                    String alreadyExistingSubjects[] = subjectDAO.getSubjectNames(organization);
                     for (int i = 0; i < alreadyExistingSubjects.length; i++) {
                         if (Objects.equals(alreadyExistingSubjects[i], subject)) {
                             addNew = false;
@@ -54,7 +54,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
 
                 if (addNew) {
                     try {
-                        subjectsDAO.addNewSubject(organization, subject);
+                        subjectDAO.addSubject(organization, subject);
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }

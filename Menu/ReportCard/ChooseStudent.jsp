@@ -17,9 +17,9 @@
         <p class="input-background">
           <span class="text">Оберіть учня: </span>
           <table>
-            <c:forEach items="${sessionScope.StudentsFromThisClass}" var="ThisStundent" varStatus="loop">
+            <c:forEach items="${sessionScope.StudentsFromThisClass}" var="ThisStudent" varStatus="loop">
               <tr>
-                <td>${ThisStundent}</td>
+                <td>${ThisStudent.lastName} ${ThisStudent.firstName} ${ThisStudent.middleName}</td>
                 <td><input type="SUBMIT" name="Student${loop.index}" value="Обрати" id="button"/></td>
               </tr>
             </c:forEach>
