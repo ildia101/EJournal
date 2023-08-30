@@ -6,37 +6,41 @@ import java.util.HashMap;
 
 public class ClassDAO {
     public int createClass(int organizationID, String classroom) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO class VALUES(DEFAULT, ?, ?)");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO class VALUES(DEFAULT, ?, ?)");
 
-            workWithDB.setInt(1, organizationID);
-            workWithDB.setString(2, classroom);
+            preparedStatement.setInt(1, organizationID);
+            preparedStatement.setString(2, classroom);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
 
-            workWithDB = connectToDB.prepareStatement("SELECT LAST_INSERT_ID();");
-            ResultSet result = workWithDB.executeQuery();
+            preparedStatement = connection.prepareStatement("SELECT LAST_INSERT_ID();");
+            ResultSet result = preparedStatement.executeQuery();
             result.next();
             return result.getInt(1);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public String[] getClassNames(int organizationID) throws SQLException{
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT name FROM class WHERE organization_id = ? ORDER BY name");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT name FROM class WHERE organization_id = ? ORDER BY name");
 
-            workWithDB.setInt(1, organizationID);
+            preparedStatement.setInt(1, organizationID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             ArrayList<String> arrayList = new ArrayList<>();
             while (result.next()){
@@ -45,21 +49,25 @@ public class ClassDAO {
 
             return arrayList.toArray(new String[0]);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public HashMap<String, Integer> getClassIDs(int organizationID) throws SQLException{
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT * FROM class WHERE organization_id = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM class WHERE organization_id = ?");
 
-            workWithDB.setInt(1, organizationID);
+            preparedStatement.setInt(1, organizationID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             HashMap<String, Integer> hashMap = new HashMap<>();
             while (result.next()){
@@ -68,21 +76,25 @@ public class ClassDAO {
 
             return hashMap;
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public boolean isThisClassInThisOrganization(int classID, int organizationID) throws SQLException{
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT organization_id FROM class WHERE id = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT organization_id FROM class WHERE id = ?");
 
-            workWithDB.setInt(1, classID);
+            preparedStatement.setInt(1, classID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             if(result.getInt("organization_id")==organizationID){
                 return true;
@@ -90,24 +102,32 @@ public class ClassDAO {
                 return false;
             }
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteClassByID(int id) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM class WHERE id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM class WHERE id = ?;");
 
-            workWithDB.setInt(1, id);
+            preparedStatement.setInt(1, id);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 }

@@ -5,32 +5,36 @@ import java.util.ArrayList;
 
 public class ClassStudentDAO {
     public void addStudentToClass(int classID, int studentID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO class_student VALUES(DEFAULT, ?, ?);");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO class_student VALUES(DEFAULT, ?, ?);");
 
-            workWithDB.setInt(1, classID);
-            workWithDB.setInt(2, studentID);
+            preparedStatement.setInt(1, classID);
+            preparedStatement.setInt(2, studentID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public Integer[] getAllStudentIDs(int classID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT student_id FROM class_student WHERE class_id = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT student_id FROM class_student WHERE class_id = ?");
 
-            workWithDB.setInt(1, classID);
+            preparedStatement.setInt(1, classID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             ArrayList<Integer> arrayList = new ArrayList<>();
             while (result.next()){
@@ -39,19 +43,23 @@ public class ClassStudentDAO {
 
             return arrayList.toArray(new Integer[0]);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public int getID(int classID, int studentID) throws SQLException {
-        Connection connectToDB = null;
-        Statement workWithDB = null;
+        Connection connection = null;
+        Statement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.createStatement();
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.createStatement();
 
-            ResultSet result = workWithDB.executeQuery("SELECT * FROM class_student");
+            ResultSet result = preparedStatement.executeQuery("SELECT * FROM class_student");
 
             int id = -1;
 
@@ -64,24 +72,32 @@ public class ClassStudentDAO {
 
             return id;
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteInfoByClassID(int classID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM class_student WHERE class_id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM class_student WHERE class_id = ?;");
 
-            workWithDB.setInt(1, classID);
+            preparedStatement.setInt(1, classID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 }

@@ -7,96 +7,120 @@ import java.util.ArrayList;
 
 public class MarkDAO {
     public void addMark(int classStudentID, int subjectID, String date, String mark) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO mark VALUES(DEFAULT, ?, ?, ?, ?)");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO mark VALUES(DEFAULT, ?, ?, ?, ?)");
 
-            workWithDB.setInt(1, classStudentID);
-            workWithDB.setInt(2, subjectID);
-            workWithDB.setString(3, date);
-            workWithDB.setString(4, mark);
+            preparedStatement.setInt(1, classStudentID);
+            preparedStatement.setInt(2, subjectID);
+            preparedStatement.setString(3, date);
+            preparedStatement.setString(4, mark);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public MarkEntity[] getSubjectMarks(int classStudentID, int subjectID) throws SQLException{
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT * FROM mark WHERE class_student_id = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM mark WHERE class_student_id = ?");
 
-            workWithDB.setInt(1, classStudentID);
+            preparedStatement.setInt(1, classStudentID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             ArrayList<MarkEntity> marks = new ArrayList<>();
             while (result.next()){
                 if(result.getInt("subject_id")==subjectID) {
-                    marks.add(new MarkEntity(result.getInt("id"), result.getString("date"), result.getString("value")));
+                    marks.add(createMarkEntity(result));
                 }
             }
 
             return marks.toArray(new MarkEntity[0]);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void updateMark(int id, String date, String mark) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("UPDATE mark SET date = ?, value = ? WHERE id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("UPDATE mark SET date = ?, value = ? WHERE id = ?;");
 
-            workWithDB.setString(1, date);
-            workWithDB.setString(2, mark);
-            workWithDB.setInt(3, id);
+            preparedStatement.setString(1, date);
+            preparedStatement.setString(2, mark);
+            preparedStatement.setInt(3, id);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteStudentMarksByClassStudentID(int classStudentID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM mark WHERE class_student_id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM mark WHERE class_student_id = ?;");
 
-            workWithDB.setInt(1, classStudentID);
+            preparedStatement.setInt(1, classStudentID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteStudentMarksBySubjectID(int subjectID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM mark WHERE subject_id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM mark WHERE subject_id = ?;");
 
-            workWithDB.setInt(1, subjectID);
+            preparedStatement.setInt(1, subjectID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
+    }
+
+    private MarkEntity createMarkEntity(ResultSet resultSet) throws SQLException {
+        return new MarkEntity(resultSet.getInt("id"), resultSet.getString("date"), resultSet.getString("value"));
     }
 }

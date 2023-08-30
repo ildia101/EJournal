@@ -6,32 +6,36 @@ import java.util.HashMap;
 
 public class SubjectDAO {
     public void addSubject(int organizationID, String nameOfSubject) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO subject VALUES(DEFAULT, ?, ?);");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO subject VALUES(DEFAULT, ?, ?);");
 
-            workWithDB.setInt(1, organizationID);
-            workWithDB.setString(2, nameOfSubject);
+            preparedStatement.setInt(1, organizationID);
+            preparedStatement.setString(2, nameOfSubject);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public String[] getSubjectNames(int organizationID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT name FROM subject WHERE organization_id = ? ORDER BY name;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT name FROM subject WHERE organization_id = ? ORDER BY name;");
 
-            workWithDB.setInt(1, organizationID);
+            preparedStatement.setInt(1, organizationID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             ArrayList<String> arrayList = new ArrayList<>();
             while (result.next()){
@@ -40,21 +44,25 @@ public class SubjectDAO {
 
             return arrayList.toArray(new String[0]);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public HashMap<String, Integer> getSubjectIDs(int organizationID) throws SQLException{
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT * FROM subject WHERE organization_id = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM subject WHERE organization_id = ?");
 
-            workWithDB.setInt(1, organizationID);
+            preparedStatement.setInt(1, organizationID);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             HashMap<String, Integer> hashMap = new HashMap<>();
             while (result.next()){
@@ -63,24 +71,32 @@ public class SubjectDAO {
 
             return hashMap;
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteSubjectByID(int subjectID) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM subject WHERE id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM subject WHERE id = ?;");
 
-            workWithDB.setInt(1, subjectID);
+            preparedStatement.setInt(1, subjectID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 }

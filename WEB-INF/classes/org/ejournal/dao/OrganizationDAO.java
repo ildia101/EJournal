@@ -4,39 +4,47 @@ import java.sql.*;
 
 public class OrganizationDAO {
     public void createOrganization(String codeOfOrganization) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO organization VALUES(DEFAULT, ?)");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO organization VALUES(DEFAULT, ?)");
 
-            workWithDB.setString(1, codeOfOrganization);
+            preparedStatement.setString(1, codeOfOrganization);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public int getOrganizationIdByName(String codeOfOrganization) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("SELECT id FROM organization WHERE name = ?");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("SELECT id FROM organization WHERE name = ?");
 
-            workWithDB.setString(1, codeOfOrganization);
+            preparedStatement.setString(1, codeOfOrganization);
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
             if(result.next()){
                 return result.getInt("id");
             } else {
                 return -1;
             }
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 }

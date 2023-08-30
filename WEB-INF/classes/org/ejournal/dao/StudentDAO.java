@@ -7,52 +7,60 @@ import java.util.ArrayList;
 
 public class StudentDAO {
     public int addStudent(String firstName, String lastName, String middleName) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("INSERT INTO student VALUES(DEFAULT, ?, ?, ?);");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("INSERT INTO student VALUES(DEFAULT, ?, ?, ?);");
 
-            workWithDB.setString(1, firstName);
-            workWithDB.setString(2, lastName);
-            workWithDB.setString(3, middleName);
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, middleName);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
 
-            workWithDB = connectToDB.prepareStatement("SELECT LAST_INSERT_ID();");
-            ResultSet result = workWithDB.executeQuery();
+            preparedStatement = connection.prepareStatement("SELECT LAST_INSERT_ID();");
+            ResultSet result = preparedStatement.executeQuery();
             result.next();
             return result.getInt(1);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void editStudent(int studentID, String firstName, String lastName, String middleName) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("UPDATE student SET first_name = ?, last_name = ?, middle_name = ? WHERE id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("UPDATE student SET first_name = ?, last_name = ?, middle_name = ? WHERE id = ?;");
 
-            workWithDB.setString(1, firstName);
-            workWithDB.setString(2, lastName);
-            workWithDB.setString(3, middleName);
-            workWithDB.setInt(4, studentID);
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, middleName);
+            preparedStatement.setInt(4, studentID);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public StudentEntity[] getStudentsByIdAsArray(Integer studentIDs[]) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("SELECT * FROM student WHERE id IN (");
             for (int i = 0; i < studentIDs.length; i++) {
@@ -64,39 +72,51 @@ public class StudentDAO {
             }
             stringBuilder.append(") ORDER BY last_name;");
 
-            workWithDB = connectToDB.prepareStatement(stringBuilder.toString());
+            preparedStatement = connection.prepareStatement(stringBuilder.toString());
 
             for (int i = 0; i < studentIDs.length; i++) {
-                workWithDB.setInt(i+1, studentIDs[i]);
+                preparedStatement.setInt(i+1, studentIDs[i]);
             }
 
-            ResultSet result = workWithDB.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
 
             ArrayList<StudentEntity> students = new ArrayList<>();
             while (result.next()){
-                students.add(new StudentEntity(result.getInt("id"), result.getString("first_name"), result.getString("last_name"), result.getString("middle_name")));
+                students.add(createStudentEntity(result));
             }
 
             return students.toArray(new StudentEntity[0]);
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
     }
 
     public void deleteStudentByID(int id) throws SQLException {
-        Connection connectToDB = null;
-        PreparedStatement workWithDB = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            connectToDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/ejournal2.0", "root", "root");
-            workWithDB = connectToDB.prepareStatement("DELETE FROM student WHERE id = ?;");
+            connection = new DatabaseConnectionProvider().createDatabaseConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM student WHERE id = ?;");
 
-            workWithDB.setInt(1, id);
+            preparedStatement.setInt(1, id);
 
-            workWithDB.executeUpdate();
+            preparedStatement.executeUpdate();
         } finally {
-            workWithDB.close();
-            connectToDB.close();
+            if(preparedStatement!=null) {
+                preparedStatement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
         }
+    }
+
+    private StudentEntity createStudentEntity(ResultSet resultSet) throws SQLException {
+        return new StudentEntity(resultSet.getInt("id"), resultSet.getString("first_name"), resultSet.getString("last_name"), resultSet.getString("middle_name"));
     }
 }
