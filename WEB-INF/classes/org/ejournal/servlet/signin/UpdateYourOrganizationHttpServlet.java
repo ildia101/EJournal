@@ -23,8 +23,8 @@ public class UpdateYourOrganizationHttpServlet extends HttpServlet {
         String code = request.getParameter("code");
 
         try {
-            int organizationID = organizationDAO.getOrganizationIdByName(code);
-            if(organizationID!=-1){
+            Integer organizationID = organizationDAO.getOrganizationIdByName(code);
+            if(organizationID!=null){
                 userDAO.updateUserOrganization((String) session.getAttribute("Email"), organizationID);
                 session.setAttribute("Organization", organizationID);
 

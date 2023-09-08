@@ -23,8 +23,8 @@ public class Register2ndStepHttpServlet extends HttpServlet {
         String code = request.getParameter("code");
 
         try {
-            int organizationID = organizationDAO.getOrganizationIdByName(code);
-            if(organizationID!=-1){
+            Integer organizationID = organizationDAO.getOrganizationIdByName(code);
+            if(organizationID!=null){
                 try {
                     String role = (String)session.getAttribute("Role");
                     String name = (String)session.getAttribute("Name");

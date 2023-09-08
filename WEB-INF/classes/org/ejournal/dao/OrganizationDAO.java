@@ -23,7 +23,7 @@ public class OrganizationDAO {
         }
     }
 
-    public int getOrganizationIdByName(String codeOfOrganization) throws SQLException {
+    public Integer getOrganizationIdByName(String codeOfOrganization) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -36,7 +36,7 @@ public class OrganizationDAO {
             if(result.next()){
                 return result.getInt("id");
             } else {
-                return -1;
+                return null;
             }
         } finally {
             if(preparedStatement!=null) {
