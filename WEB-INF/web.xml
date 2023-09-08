@@ -24,19 +24,25 @@
 	<!-- Login/Register -->
 	
 	<servlet>
-		<servlet-name>LoginAndRegister</servlet-name>
-		<servlet-class>org.ejournal.servlet.signin.LoginAndRegisterHttpServlet</servlet-class>
+		<servlet-name>Login</servlet-name>
+		<servlet-class>org.ejournal.servlet.signin.LoginHttpServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
-		<servlet-name>LoginAndRegister</servlet-name>
-		<url-pattern>/SignUp/CreateAccount</url-pattern>
-	</servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>LoginAndRegister</servlet-name>
+		<servlet-name>Login</servlet-name>
 		<url-pattern>/Login/SignIn</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RegisterUser</servlet-name>
+		<servlet-class>org.ejournal.servlet.signin.RegisterUserHttpServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>RegisterUser</servlet-name>
+		<url-pattern>/SignUp/CreateAccount</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

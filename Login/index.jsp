@@ -15,7 +15,6 @@
       <div id="wrapper">
         <div id="input-field">
           <form method="POST" action="SignIn">
-            <input type="hidden" name="process" value="login" />
             <p class="input-background-wide">
               <span class="input-text">Ім'я поштової скриньки:</span>
               <input type="email" name="email" class="input-info" value="${SavedInfo.Email}"/>

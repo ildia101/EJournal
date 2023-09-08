@@ -16,7 +16,6 @@
       <div id="wrapper">
         <div id="input-field">
           <form method="POST" action="CreateAccount">
-            <input type="hidden" name="process" value="registration" />
             <p class="input-background-wide">
               <span class="input-text">Ваша посада:</span>
               <span class="new-line"></span>
