@@ -7,7 +7,6 @@
 	version="5.0">
 	
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 	
@@ -18,7 +17,7 @@
 	
 	<filter-mapping>
 		<filter-name>CheckSessionForEnteredLogin</filter-name>
-		<url-pattern>/Menu/*</url-pattern>
+		<url-pattern>/jsp/Menu/*</url-pattern>
 	</filter-mapping>
 	
 	<!-- Login/Register -->
@@ -31,7 +30,7 @@
 
 	<servlet-mapping>
 		<servlet-name>Login</servlet-name>
-		<url-pattern>/Login/SignIn</url-pattern>
+		<url-pattern>/jsp/Login/SignIn</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -42,7 +41,7 @@
 
 	<servlet-mapping>
 		<servlet-name>RegisterUser</servlet-name>
-		<url-pattern>/SignUp/CreateAccount</url-pattern>
+		<url-pattern>/jsp/SignUp/CreateAccount</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -53,7 +52,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>Register2ndStep</servlet-name>
-		<url-pattern>/SignUp/CreateAccountNextStep</url-pattern>
+		<url-pattern>/jsp/SignUp/CreateAccountNextStep</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -64,7 +63,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>UpdateOrganization</servlet-name>
-		<url-pattern>/Login/UpdateYourOrganization</url-pattern>
+		<url-pattern>/jsp/Login/UpdateYourOrganization</url-pattern>
 	</servlet-mapping>
 	
 	<!-- MENU -->
@@ -77,7 +76,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetAListOfStudents</servlet-name>
-		<url-pattern>/Menu/CreateClassroom/EnterAListOfStudents</url-pattern>
+		<url-pattern>/jsp/Menu/CreateClassroom/EnterAListOfStudents</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -87,7 +86,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>CreatedClassroom</servlet-name>
-		<url-pattern>/Menu/CreateClassroom/CreatedClassroom</url-pattern>
+		<url-pattern>/jsp/Menu/CreateClassroom/CreatedClassroom</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Add Information -->
@@ -100,7 +99,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>ChooseClassroomForEditing</servlet-name>
-		<url-pattern>/Menu/AddInformation/SelectClassroom</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/SelectClassroom</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -110,7 +109,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>EditSelectedClass</servlet-name>
-		<url-pattern>/Menu/AddInformation/EditClassroom</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/EditClassroom</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -120,7 +119,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>UpdateSelectedClass</servlet-name>
-		<url-pattern>/Menu/AddInformation/UpdatedClassroom</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/UpdatedClassroom</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Add subject -->
@@ -132,7 +131,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>AddSubject</servlet-name>
-		<url-pattern>/Menu/AddInformation/AddSubject/AddNextSubject</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/AddSubject/AddNextSubject</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Add grades -->
@@ -144,7 +143,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>ChooseClassAndSubject</servlet-name>
-		<url-pattern>/Menu/AddInformation/ChooseClassAndSubject</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/ChooseClassAndSubject</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -154,7 +153,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetClassGrades</servlet-name>
-		<url-pattern>/Menu/AddInformation/InputGrades</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/InputGrades</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -164,7 +163,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>UploadGrades</servlet-name>
-		<url-pattern>/Menu/AddInformation/SaveGrades</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/SaveGrades</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -174,7 +173,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>TurnPage</servlet-name>
-		<url-pattern>/Menu/AddInformation/TurnThePage</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/TurnThePage</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Delete information -->
@@ -186,17 +185,17 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetClassesAndSubjects</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseClass</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/ChooseClass</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
 		<servlet-name>GetClassesAndSubjects</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseSubject</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/ChooseSubject</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
 		<servlet-name>GetClassesAndSubjects</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/ChooseClassGrades</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/ChooseClassGrades</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -206,17 +205,17 @@
 	
 	<servlet-mapping>
 		<servlet-name>DeleteInfo</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteClass</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/DeleteClass</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
 		<servlet-name>DeleteInfo</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteSubject</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/DeleteSubject</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
 		<servlet-name>DeleteInfo</servlet-name>
-		<url-pattern>/Menu/AddInformation/DeleteInformation/DeleteMarks</url-pattern>
+		<url-pattern>/jsp/Menu/AddInformation/DeleteInformation/DeleteMarks</url-pattern>
 	</servlet-mapping>
 	
 	
@@ -229,7 +228,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetClasses</servlet-name>
-		<url-pattern>/Menu/SelectClassToCreateReportCard</url-pattern>
+		<url-pattern>/jsp/Menu/SelectClassToCreateReportCard</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -239,7 +238,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetStudents</servlet-name>
-		<url-pattern>/Menu/SelectStudentToCreateReportCard</url-pattern>
+		<url-pattern>/jsp/Menu/SelectStudentToCreateReportCard</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -249,7 +248,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>CreateReportCard</servlet-name>
-		<url-pattern>/Menu/CreateReportCardOfThisStudent</url-pattern>
+		<url-pattern>/jsp/Menu/CreateReportCardOfThisStudent</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Employees -->
@@ -261,7 +260,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>GetListOfEmployees</servlet-name>
-		<url-pattern>/Menu/Employees</url-pattern>
+		<url-pattern>/jsp/Menu/Employees</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -271,7 +270,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>SaveEmployees</servlet-name>
-		<url-pattern>/Menu/SaveEmployees</url-pattern>
+		<url-pattern>/jsp/Menu/SaveEmployees</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Sign Out -->
@@ -283,25 +282,25 @@
 	
 	<servlet-mapping>
 		<servlet-name>SignOut</servlet-name>
-		<url-pattern>/Menu/SignOut</url-pattern>
+		<url-pattern>/jsp/Menu/SignOut</url-pattern>
 	</servlet-mapping>
 	
 	<!-- Errors -->
 	
 	<error-page>
 		<error-code>404</error-code>
-		<location>/WEB-INF/Errors/404.html</location>
+		<location>/WEB-INF/Errors/404.jsp</location>
 	</error-page>
 	
 	<!--
 	<error-page>
 		<error-code>405</error-code>
-		<location>/WEB-INF/Errors/405.html</location>
+		<location>/WEB-INF/Errors/405.jsp</location>
 	</error-page>
 	
 	<error-page>
 		<error-code>500</error-code>
-		<location>/WEB-INF/Errors/500.html</location>
+		<location>/WEB-INF/Errors/500.jsp</location>
 	</error-page>
 	-->
 	

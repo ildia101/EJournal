@@ -19,16 +19,16 @@
         <c:choose>
           <c:when test="${sessionScope.LoggedIn == true}">
             <p class="input-background">
-              <a href="./Menu" class="button-link">Ви вже увійшли до облікового запису. Натисніть, щоб перейти до системи.</a>
+              <a href="${pageContext.request.contextPath}/jsp/Menu" class="button-link">Ви вже увійшли до облікового запису. Натисніть, щоб перейти до системи.</a>
             </p>
           </c:when>
           <c:otherwise>
             <p class="input-background">
-              <a href="./Login" class="button-link">Увійти до облікового запису</a>
+              <a href="${pageContext.request.contextPath}/jsp/Login" class="button-link">Увійти до облікового запису</a>
             </p>
     
             <p class="input-background">
-              <a href="./SignUp" class="button-link">Зареєструвати обліковий запис</a>
+              <a href="${pageContext.request.contextPath}/jsp/SignUp" class="button-link">Зареєструвати обліковий запис</a>
             </p>
           </c:otherwise>
         </c:choose>

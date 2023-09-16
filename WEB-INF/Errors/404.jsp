@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=utf-8" %>
 <!DOCTYPE html>
 <html lang="uk-UA">
   <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Не знайдено</title>
 
-    <link rel="stylesheet" href="../css/general.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/general.css" />
   </head>
 
   <body>
@@ -16,7 +17,7 @@
         </p>
 
         <p class="input-background">
-          <a href="../" class="button-link">Повернутися</a>
+          <a href="${pageContext.request.contextPath}/jsp/Menu" class="button-link">Повернутися</a>
         </p>
       </div>
     </div>

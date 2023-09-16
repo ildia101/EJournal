@@ -43,7 +43,7 @@ public class UpdateClassroomHttpServlet extends HttpServlet {
             }
 
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditClassroom/UpdatedClassroom.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditClassroom/UpdatedClassroom.jsp");
             requestDispatcher.forward(request, response);
         } else {
             request.setAttribute("StudentsFromThisClass", students);

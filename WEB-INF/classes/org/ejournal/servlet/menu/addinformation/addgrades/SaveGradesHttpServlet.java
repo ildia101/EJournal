@@ -13,14 +13,12 @@ import java.util.Objects;
 public class SaveGradesHttpServlet extends HttpServlet {
     private ClassDAO classDAO;
     private ClassStudentDAO classStudentDAO;
-    private StudentDAO studentDAO;
     private SubjectDAO subjectDAO;
     private MarkDAO markDAO;
 
     public SaveGradesHttpServlet() {
         this.classDAO = new ClassDAO();
         this.classStudentDAO = new ClassStudentDAO();
-        this.studentDAO = new StudentDAO();
         this.subjectDAO = new SubjectDAO();
         this.markDAO = new MarkDAO();
     }
@@ -122,7 +120,7 @@ public class SaveGradesHttpServlet extends HttpServlet {
             session.removeAttribute("Marks");
             session.removeAttribute("MarksFromDB");
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/AddedGrades.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/AddedGrades.jsp");
             requestDispatcher.forward(request, response);
         } else {
             MarkEntity savedMarks[] = new MarkEntity[students.length*17];

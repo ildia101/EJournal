@@ -64,12 +64,12 @@ public class SaveChangesHttpServlet extends HttpServlet {
                     request.setAttribute("SomeInfo", true);
                     request.setAttribute("Info", "Призначте іншого директора перед видаленням цього");
 
-                    RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
+                    RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/Menu/Employees");
                     requestDispatcher.forward(request, response);
                 }
             }
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditEmployees/UpdatedEmployees.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("EditEmployees/UpdatedEmployees.jsp");
             requestDispatcher.forward(request, response);
         } else {
             for (int i = 0; i < employees.size(); i++) {
@@ -121,7 +121,7 @@ public class SaveChangesHttpServlet extends HttpServlet {
                         request.setAttribute("SomeInfo", true);
                         request.setAttribute("Info", "Призначте іншого директора перед видаленням цього");
 
-                        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
+                        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/Menu/Employees");
                         requestDispatcher.forward(request, response);
                     }
 
@@ -132,7 +132,7 @@ public class SaveChangesHttpServlet extends HttpServlet {
             request.setAttribute("SomeInfo", true);
             request.setAttribute("Info", "Співпрацівника видалено успішно");
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Menu/Employees");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/Menu/Employees");
             requestDispatcher.forward(request, response);
         }
 

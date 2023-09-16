@@ -25,12 +25,10 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
         String button = request.getParameter("button");
 
         if (Objects.equals(button, "Вийти без додавання")) {
-            addNew = false;
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.jsp");
             requestDispatcher.forward(request, response);
         } else {
             if (subject.isEmpty()) {
-                addNew = false;
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
                 request.setAttribute("SomeInfo", true);
                 request.setAttribute("Info", "Поле з назвою предмета порожнє");
@@ -67,7 +65,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
                     request.setAttribute("SomeInfo", true);
                     request.setAttribute("Info", "Предмет додано успішно");
                 } else if (Objects.equals(button, "Додати й завершити")) {
-                    requestDispatcher = request.getRequestDispatcher("Finish.html");
+                    requestDispatcher = request.getRequestDispatcher("Finish.jsp");
                 }
                 requestDispatcher.forward(request, response);
             }

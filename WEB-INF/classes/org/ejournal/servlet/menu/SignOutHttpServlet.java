@@ -10,7 +10,7 @@ public class SignOutHttpServlet extends HttpServlet {
         HttpSession session = request.getSession();
         session.invalidate();
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("SignOut.html");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("SignOut.jsp");
         requestDispatcher.forward(request, response);
     }
 }

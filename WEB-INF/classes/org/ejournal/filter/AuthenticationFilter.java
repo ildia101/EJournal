@@ -15,7 +15,7 @@ public class AuthenticationFilter implements Filter {
         HttpSession session = request.getSession();
 
         if(session.getAttribute("LoggedIn") == null){
-            response.sendRedirect("../index.jsp");
+            response.sendRedirect(request.getContextPath());
         } else {
             filterChain.doFilter(servletRequest, servletResponse);
         }

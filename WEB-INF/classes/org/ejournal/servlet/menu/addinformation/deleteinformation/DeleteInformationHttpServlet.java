@@ -106,7 +106,7 @@ public class DeleteInformationHttpServlet extends HttpServlet {
             session.removeAttribute("Classes");
             session.removeAttribute("Subjects");
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.jsp");
             requestDispatcher.forward(request, response);
         }
     }

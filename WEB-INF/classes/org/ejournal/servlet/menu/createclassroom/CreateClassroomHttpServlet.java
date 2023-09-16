@@ -52,7 +52,7 @@ public class CreateClassroomHttpServlet extends HttpServlet {
             session.removeAttribute("Classroom");
             session.removeAttribute("ListOfStudents");
 
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("CreatedClassroom.html");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("CreatedClassroom.jsp");
             requestDispatcher.forward(request, response);
         } else {
             session.setAttribute("ListOfStudents", students);
