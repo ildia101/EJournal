@@ -4,6 +4,8 @@ import java.sql.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.ejournal.dao.SubjectDAO;
+import org.ejournal.dto.NewSchoolSubjectParametersRequest;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -21,14 +23,13 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
         HttpSession session = request.getSession();
         int organization = (int) session.getAttribute("Organization");
 
-        String subject = request.getParameter("subject");
-        String button = request.getParameter("button");
+        NewSchoolSubjectParametersRequest subjectParametersRequest = new NewSchoolSubjectParametersRequest(request.getParameter("subject"), request.getParameter("button"));
 
-        if (Objects.equals(button, "Вийти без додавання")) {
+        if (Objects.equals(subjectParametersRequest.getButtonText(), "Вийти без додавання")) {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.jsp");
             requestDispatcher.forward(request, response);
         } else {
-            if (subject.isEmpty()) {
+            if (subjectParametersRequest.getSubjectName().isEmpty()) {
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
                 request.setAttribute("SomeInfo", true);
                 request.setAttribute("Info", "Поле з назвою предмета порожнє");
@@ -37,7 +38,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
                 try {
                     String alreadyExistingSubjects[] = subjectDAO.getSubjectNames(organization);
                     for (int i = 0; i < alreadyExistingSubjects.length; i++) {
-                        if (Objects.equals(alreadyExistingSubjects[i], subject)) {
+                        if (Objects.equals(alreadyExistingSubjects[i], subjectParametersRequest.getSubjectName())) {
                             addNew = false;
                             RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
                             request.setAttribute("SomeInfo", true);
@@ -52,19 +53,19 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
 
                 if (addNew) {
                     try {
-                        subjectDAO.addSubject(organization, subject);
+                        subjectDAO.addSubject(organization, subjectParametersRequest.getSubjectName());
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
                 }
 
                 RequestDispatcher requestDispatcher = null;
-                if (Objects.equals(button, "Додати")) {
+                if (Objects.equals(subjectParametersRequest.getButtonText(), "Додати")) {
                     requestDispatcher = request.getRequestDispatcher("index.jsp");
 
                     request.setAttribute("SomeInfo", true);
                     request.setAttribute("Info", "Предмет додано успішно");
-                } else if (Objects.equals(button, "Додати й завершити")) {
+                } else if (Objects.equals(subjectParametersRequest.getButtonText(), "Додати й завершити")) {
                     requestDispatcher = request.getRequestDispatcher("Finish.jsp");
                 }
                 requestDispatcher.forward(request, response);

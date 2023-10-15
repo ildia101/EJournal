@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.ejournal.dao.UserDAO;
 import org.ejournal.dao.entities.UserEntity;
+import org.ejournal.dto.UserParametersRequest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -25,16 +26,15 @@ public class LoginHttpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        String email = request.getParameter("email");
-        String password = request.getParameter("pass");
+        UserParametersRequest userParametersRequest = new UserParametersRequest(request.getParameter("email"), request.getParameter("pass"));
 
         HashMap<String, String> savedInfo = new HashMap<>();
-        savedInfo.put("Email", email);
+        savedInfo.put("Email", userParametersRequest.getEmail());
 
         try {
-            UserEntity user = userDAO.getUser(email);
+            UserEntity user = userDAO.getUser(userParametersRequest.getEmail());
             if(user!=null) {
-                if (Objects.equals(user.getPassword(), password)) {
+                if (Objects.equals(user.getPassword(), userParametersRequest.getPassword())) {
                     session.setAttribute("LoggedIn", true);
 
                     session.setAttribute("Role", user.getRole());
@@ -47,7 +47,7 @@ public class LoginHttpServlet extends HttpServlet {
                     int organization = user.getOrganizationId();
                     if (organization == -1) {
                         request.setAttribute("EnterCodePage", true);
-                        session.setAttribute("Email", email);
+                        session.setAttribute("Email", userParametersRequest.getEmail());
 
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
                         requestDispatcher.forward(request, response);

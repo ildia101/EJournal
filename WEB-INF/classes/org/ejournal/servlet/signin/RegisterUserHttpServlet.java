@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.ejournal.dao.OrganizationDAO;
 import org.ejournal.dao.UserDAO;
+import org.ejournal.dto.UserParametersRequest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,27 +29,25 @@ public class RegisterUserHttpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String password = request.getParameter("pass");
+        UserParametersRequest userParametersRequest = new UserParametersRequest(request.getParameter("name"), request.getParameter("email"), request.getParameter("pass"));
 
         HashMap<String, String> savedInfo = new HashMap<>();
-        savedInfo.put("Email", email);
+        savedInfo.put("Email", userParametersRequest.getEmail());
 
         try {
             String role = request.getParameter("role");
 
-            savedInfo.put("Name", name);
+            savedInfo.put("Name", userParametersRequest.getName());
             if(Objects.equals(role, "none")){
                 request.setAttribute("InvalidData", "Оберіть Вашу посаду");
                 returnError(request, response, savedInfo);
-            } else if(name.isEmpty()){
+            } else if(userParametersRequest.getName().isEmpty()){
                 request.setAttribute("InvalidData", "Поле з ПІБ порожнє");
                 returnError(request, response, savedInfo);
-            } else if(email.isEmpty()){
+            } else if(userParametersRequest.getEmail().isEmpty()){
                 request.setAttribute("InvalidData", "Поле з адресою електронної пошти порожнє");
                 returnError(request, response, savedInfo);
-            } else if(password.isEmpty()){
+            } else if(userParametersRequest.getPassword().isEmpty()){
                 request.setAttribute("InvalidData", "Поле з паролем порожнє");
                 returnError(request, response, savedInfo);
             } else {
@@ -61,7 +60,7 @@ public class RegisterUserHttpServlet extends HttpServlet {
 
                     organizationDAO.createOrganization(code.toString());
                     int organizationID = organizationDAO.getOrganizationIdByName(code.toString());
-                    userDAO.createUser(organizationID, role, name, email, password);
+                    userDAO.createUser(organizationID, role, userParametersRequest.getName(), userParametersRequest.getEmail(), userParametersRequest.getPassword());
 
                     request.setAttribute("Code", code);
 
@@ -70,9 +69,9 @@ public class RegisterUserHttpServlet extends HttpServlet {
                     requestDispatcher.forward(request, response);
                 } else {
                     session.setAttribute("Role", role);
-                    session.setAttribute("Name", name);
-                    session.setAttribute("Email", email);
-                    session.setAttribute("Password", password);
+                    session.setAttribute("Name", userParametersRequest.getName());
+                    session.setAttribute("Email", userParametersRequest.getEmail());
+                    session.setAttribute("Password", userParametersRequest.getPassword());
 
                     request.setAttribute("EnterCodePage", true);
                     RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
