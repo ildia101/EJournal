@@ -18,7 +18,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean addNew = true;
+        boolean addNew;
 
         HttpSession session = request.getSession();
         int organization = (int) session.getAttribute("Organization");
@@ -36,17 +36,7 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
                 requestDispatcher.forward(request, response);
             } else {
                 try {
-                    String alreadyExistingSubjects[] = subjectDAO.getSubjectNames(organization);
-                    for (int i = 0; i < alreadyExistingSubjects.length; i++) {
-                        if (Objects.equals(alreadyExistingSubjects[i], subjectParametersRequest.getSubjectName())) {
-                            addNew = false;
-                            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
-                            request.setAttribute("SomeInfo", true);
-                            request.setAttribute("Info", "Такий предмет вже існує");
-                            requestDispatcher.forward(request, response);
-                            break;
-                        }
-                    }
+                    addNew = checkForAlreadyExistingSubject(request, response, organization, subjectParametersRequest);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -71,5 +61,21 @@ public class AddSchoolSubjectHttpServlet extends HttpServlet {
                 requestDispatcher.forward(request, response);
             }
         }
+    }
+
+    private boolean checkForAlreadyExistingSubject(HttpServletRequest request, HttpServletResponse response, int organization, NewSchoolSubjectParametersRequest subjectParametersRequest) throws SQLException, ServletException, IOException {
+        boolean addNew = true;
+        String alreadyExistingSubjects[] = subjectDAO.getSubjectNames(organization);
+        for (int i = 0; i < alreadyExistingSubjects.length; i++) {
+            if (Objects.equals(alreadyExistingSubjects[i], subjectParametersRequest.getSubjectName())) {
+                addNew = false;
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+                request.setAttribute("SomeInfo", true);
+                request.setAttribute("Info", "Такий предмет вже існує");
+                requestDispatcher.forward(request, response);
+                break;
+            }
+        }
+        return addNew;
     }
 }

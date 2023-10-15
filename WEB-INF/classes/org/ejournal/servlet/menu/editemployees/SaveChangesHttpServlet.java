@@ -26,31 +26,12 @@ public class SaveChangesHttpServlet extends HttpServlet {
             boolean changeRoleOfThisEmployee;
             for (int i = 0; i < employees.size(); i++) {
                 changeRoleOfThisEmployee = true;
-                UserEntity thisEmployee = null;
-                for (int j = 0; j < employees.size(); j++) {
-                    thisEmployee = employees.get(j);
-                    if (Objects.equals(thisEmployee.getName(), request.getParameter("employee" + i))) {
-                        break;
-                    }
-                }
+                UserEntity thisEmployee = findEmployee(request, employees, i);
                 String role = thisEmployee.getRole();
                 if (Objects.equals(role, "principal")) {
                     String newRole = request.getParameter("JobTitle" + i);
                     if (!role.equals(newRole)) {
-                        ArrayList<String> listOfRoles = new ArrayList<>();
-                        for (int j = 0; j < employees.size(); j++) {
-                            listOfRoles.add(employees.get(j).getRole());
-                        }
-                        listOfRoles.remove(role);
-
-                        for (int j = 0; j < listOfRoles.size(); j++) {
-                            if (Objects.equals(listOfRoles.get(j), "principal")) {
-                                changeRoleOfThisEmployee = true;
-                                break;
-                            } else {
-                                changeRoleOfThisEmployee = false;
-                            }
-                        }
+                        changeRoleOfThisEmployee = checkForAnotherPrincipal(employees, role);
                     }
                 }
 
@@ -76,46 +57,18 @@ public class SaveChangesHttpServlet extends HttpServlet {
                 if (request.getParameter("Delete" + i) != null) {
                     boolean deleteThisEmployee = true;
 
-                    UserEntity thisEmployee = null;
-                    for (int j = 0; j < employees.size(); j++) {
-                        thisEmployee = employees.get(j);
-                        if (Objects.equals(thisEmployee.getName(), request.getParameter("employee" + i))) {
-                            break;
-                        }
-                    }
+                    UserEntity thisEmployee = findEmployee(request, employees, i);
                     String role = thisEmployee.getRole();
                     if (Objects.equals(role, "principal")) {
-                        ArrayList<String> listOfRoles = new ArrayList<>();
-                        for (int j = 0; j < employees.size(); j++) {
-                            listOfRoles.add(employees.get(j).getRole());
-                        }
-                        listOfRoles.remove(role);
-
-                        if (listOfRoles.size() == 0) {
-                            deleteThisEmployee = false;
-                        } else {
-                            for (int j = 0; j < listOfRoles.size(); j++) {
-                                if (Objects.equals(listOfRoles.get(j), "principal")) {
-                                    deleteThisEmployee = true;
-                                    break;
-                                } else {
-                                    deleteThisEmployee = false;
-                                }
-                            }
-                        }
+                        deleteThisEmployee = checkForAnotherPrincipal(employees, role);
                     }
 
                     if (deleteThisEmployee) {
-                        for (int j = 0; j < employees.size(); j++) {
-                            UserEntity employee = employees.get(j);
-                            if(Objects.equals(employee.getName(), request.getParameter("employee" + i))){
-                                try {
-                                    userDAO.updateUserOrganization(employee.getEmail(), -1);
-                                } catch (SQLException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                break;
-                            }
+                        UserEntity employee = findEmployee(request, employees, i);
+                        try {
+                            userDAO.updateUserOrganization(employee.getEmail(), -1);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
                         }
                     } else {
                         request.setAttribute("SomeInfo", true);
@@ -124,8 +77,8 @@ public class SaveChangesHttpServlet extends HttpServlet {
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/Menu/Employees");
                         requestDispatcher.forward(request, response);
                     }
-
                     break;
+
                 }
             }
 
@@ -135,6 +88,39 @@ public class SaveChangesHttpServlet extends HttpServlet {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/jsp/Menu/Employees");
             requestDispatcher.forward(request, response);
         }
+    }
 
+    private static UserEntity findEmployee(HttpServletRequest request, ArrayList<UserEntity> employees, int employeeNumber) {
+        UserEntity thisEmployee = null;
+        for (int j = 0; j < employees.size(); j++) {
+            thisEmployee = employees.get(j);
+            if (Objects.equals(thisEmployee.getName(), request.getParameter("employee" + employeeNumber))) {
+                break;
+            }
+        }
+        return thisEmployee;
+    }
+
+    private static boolean checkForAnotherPrincipal(ArrayList<UserEntity> employees, String role) {
+        boolean doSmth = true;
+        ArrayList<String> listOfRoles = new ArrayList<>();
+        for (int j = 0; j < employees.size(); j++) {
+            listOfRoles.add(employees.get(j).getRole());
+        }
+        listOfRoles.remove(role);
+
+        if (listOfRoles.size() == 0) {
+            doSmth = false;
+        } else {
+            for (int j = 0; j < listOfRoles.size(); j++) {
+                if (Objects.equals(listOfRoles.get(j), "principal")) {
+                    doSmth = true;
+                    break;
+                } else {
+                    doSmth = false;
+                }
+            }
+        }
+        return doSmth;
     }
 }

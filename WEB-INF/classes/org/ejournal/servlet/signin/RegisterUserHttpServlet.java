@@ -29,38 +29,19 @@ public class RegisterUserHttpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        UserParametersRequest userParametersRequest = new UserParametersRequest(request.getParameter("name"), request.getParameter("email"), request.getParameter("pass"));
+        UserParametersRequest userParametersRequest = new UserParametersRequest(request.getParameter("name"), request.getParameter("role"), request.getParameter("email"), request.getParameter("pass"));
 
         HashMap<String, String> savedInfo = new HashMap<>();
         savedInfo.put("Email", userParametersRequest.getEmail());
 
         try {
-            String role = request.getParameter("role");
-
             savedInfo.put("Name", userParametersRequest.getName());
-            if(Objects.equals(role, "none")){
-                request.setAttribute("InvalidData", "Оберіть Вашу посаду");
-                returnError(request, response, savedInfo);
-            } else if(userParametersRequest.getName().isEmpty()){
-                request.setAttribute("InvalidData", "Поле з ПІБ порожнє");
-                returnError(request, response, savedInfo);
-            } else if(userParametersRequest.getEmail().isEmpty()){
-                request.setAttribute("InvalidData", "Поле з адресою електронної пошти порожнє");
-                returnError(request, response, savedInfo);
-            } else if(userParametersRequest.getPassword().isEmpty()){
-                request.setAttribute("InvalidData", "Поле з паролем порожнє");
-                returnError(request, response, savedInfo);
-            } else {
-                if(Objects.equals(role, "principal")) {
-                    String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-                    StringBuilder code = new StringBuilder();
-                    for (int i = 0; i < 6; i++) {
-                        code.append(chars.charAt((int) (Math.random() * 62)));
-                    }
+            if (verifyRequest(request, response, userParametersRequest, savedInfo)) {
+                if (Objects.equals(userParametersRequest.getRole(), "principal")) {
+                    String code = createNewOrganization(organizationDAO);
 
-                    organizationDAO.createOrganization(code.toString());
-                    int organizationID = organizationDAO.getOrganizationIdByName(code.toString());
-                    userDAO.createUser(organizationID, role, userParametersRequest.getName(), userParametersRequest.getEmail(), userParametersRequest.getPassword());
+                    int organizationID = organizationDAO.getOrganizationIdByName(code);
+                    userDAO.createUser(organizationID, userParametersRequest.getRole(), userParametersRequest.getName(), userParametersRequest.getEmail(), userParametersRequest.getPassword());
 
                     request.setAttribute("Code", code);
 
@@ -68,7 +49,7 @@ public class RegisterUserHttpServlet extends HttpServlet {
                     RequestDispatcher requestDispatcher = request.getRequestDispatcher("GetCode.jsp");
                     requestDispatcher.forward(request, response);
                 } else {
-                    session.setAttribute("Role", role);
+                    session.setAttribute("Role", userParametersRequest.getRole());
                     session.setAttribute("Name", userParametersRequest.getName());
                     session.setAttribute("Email", userParametersRequest.getEmail());
                     session.setAttribute("Password", userParametersRequest.getPassword());
@@ -78,12 +59,41 @@ public class RegisterUserHttpServlet extends HttpServlet {
                     requestDispatcher.forward(request, response);
                 }
             }
-        } catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             request.setAttribute("InvalidData", "Користувач із такою адресою електронної пошти вже був зареєстрований");
             returnError(request, response, savedInfo);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean verifyRequest(HttpServletRequest request, HttpServletResponse response, UserParametersRequest userParametersRequest, HashMap<String, String> savedInfo) throws ServletException, IOException {
+        if (Objects.equals(userParametersRequest.getRole(), "none")) {
+            request.setAttribute("InvalidData", "Оберіть Вашу посаду");
+            returnError(request, response, savedInfo);
+        } else if (userParametersRequest.getName().isEmpty()) {
+            request.setAttribute("InvalidData", "Поле з ПІБ порожнє");
+            returnError(request, response, savedInfo);
+        } else if (userParametersRequest.getEmail().isEmpty()) {
+            request.setAttribute("InvalidData", "Поле з адресою електронної пошти порожнє");
+            returnError(request, response, savedInfo);
+        } else if (userParametersRequest.getPassword().isEmpty()) {
+            request.setAttribute("InvalidData", "Поле з паролем порожнє");
+            returnError(request, response, savedInfo);
+        }
+        return true;
+    }
+
+    private static String createNewOrganization(OrganizationDAO organizationDAO) throws ServletException, IOException, SQLException {
+        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            code.append(chars.charAt((int) (Math.random() * 62)));
+        }
+
+        organizationDAO.createOrganization(code.toString());
+
+        return code.toString();
     }
 
     private static void returnError(HttpServletRequest request, HttpServletResponse response, HashMap<String, String> info) throws ServletException, IOException {

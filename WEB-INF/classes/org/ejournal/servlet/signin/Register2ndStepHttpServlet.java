@@ -26,28 +26,13 @@ public class Register2ndStepHttpServlet extends HttpServlet {
             Integer organizationID = organizationDAO.getOrganizationIdByName(code);
             if(organizationID!=null){
                 try {
-                    String role = (String)session.getAttribute("Role");
-                    String name = (String)session.getAttribute("Name");
-                    String email = (String)session.getAttribute("Email");
-                    String password = (String)session.getAttribute("Password");
-
-                    userDAO.createUser(organizationID, role, name, email, password);
-
-                    session.removeAttribute("Role");
-                    session.removeAttribute("Name");
-                    session.removeAttribute("Email");
-                    session.removeAttribute("Password");
-
-                    request.setAttribute("YouAreRegisteredUser", true);
-                    RequestDispatcher requestDispatcher = request.getRequestDispatcher("RegisteredUser.jsp");
-                    requestDispatcher.forward(request, response);
+                    registerUser(request, response, session, organizationID);
                 } catch (SQLIntegrityConstraintViolationException exception){
                     request.setAttribute("Error", true);
                     request.setAttribute("InvalidData", "Користувач із такою адресою електронної пошти вже був зареєстрований");
                     RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
                     requestDispatcher.forward(request, response);
                 }
-
             } else {
                 request.setAttribute("InvalidData", "Такого коду закладу не існує");
 
@@ -59,5 +44,23 @@ public class Register2ndStepHttpServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void registerUser(HttpServletRequest request, HttpServletResponse response, HttpSession session, Integer organizationID) throws SQLException, ServletException, IOException {
+        String role = (String) session.getAttribute("Role");
+        String name = (String) session.getAttribute("Name");
+        String email = (String) session.getAttribute("Email");
+        String password = (String) session.getAttribute("Password");
+
+        userDAO.createUser(organizationID, role, name, email, password);
+
+        session.removeAttribute("Role");
+        session.removeAttribute("Name");
+        session.removeAttribute("Email");
+        session.removeAttribute("Password");
+
+        request.setAttribute("YouAreRegisteredUser", true);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("RegisteredUser.jsp");
+        requestDispatcher.forward(request, response);
     }
 }

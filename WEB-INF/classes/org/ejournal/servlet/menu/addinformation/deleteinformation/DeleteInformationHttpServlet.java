@@ -40,19 +40,7 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteClass/ChooseClass.jsp", request, response);
 
                 try {
-                    int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
-                    Integer studentsIDs[] = classStudentDAO.getAllStudentIDs(classID);
-
-                    classDAO.deleteClassByID(classID);
-
-                    for (int i = 0; i < studentsIDs.length; i++) {
-                        int classStudentID = classStudentDAO.getID(classID, studentsIDs[i]);
-                        markDAO.deleteStudentMarksByClassStudentID(classStudentID);
-
-                        studentDAO.deleteStudentByID(studentsIDs[i]);
-                    }
-
-                    classStudentDAO.deleteInfoByClassID(classID);
+                    deleteClass(session, objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -67,10 +55,7 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteSubject/ChooseSubject.jsp", request, response);
 
                 try {
-                    int subjectID = subjectDAO.getSubjectIDs((int) session.getAttribute("Organization")).get(objectToDelete);
-
-                    subjectDAO.deleteSubjectByID(subjectID);
-                    markDAO.deleteStudentMarksBySubjectID(subjectID);
+                    deleteSubject(session, objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -85,13 +70,7 @@ public class DeleteInformationHttpServlet extends HttpServlet {
                 CheckForError(objectToDelete, "DeleteMarks/ChooseClass.jsp", request, response);
 
                 try {
-                    int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
-                    Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
-
-                    for (int i = 0; i < studentIDs.length; i++) {
-                        int classStudentID = classStudentDAO.getID(classID, studentIDs[i]);
-                        markDAO.deleteStudentMarksByClassStudentID(classStudentID);
-                    }
+                    deleteClassMarks(session, objectToDelete);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -108,6 +87,39 @@ public class DeleteInformationHttpServlet extends HttpServlet {
 
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("Finish.jsp");
             requestDispatcher.forward(request, response);
+        }
+    }
+
+    private void deleteClass(HttpSession session, String objectToDelete) throws SQLException {
+        int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+        Integer studentsIDs[] = classStudentDAO.getAllStudentIDs(classID);
+
+        classDAO.deleteClassByID(classID);
+
+        for (int i = 0; i < studentsIDs.length; i++) {
+            int classStudentID = classStudentDAO.getID(classID, studentsIDs[i]);
+            markDAO.deleteStudentMarksByClassStudentID(classStudentID);
+
+            studentDAO.deleteStudentByID(studentsIDs[i]);
+        }
+
+        classStudentDAO.deleteInfoByClassID(classID);
+    }
+
+    private void deleteSubject(HttpSession session, String objectToDelete) throws SQLException {
+        int subjectID = subjectDAO.getSubjectIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+
+        subjectDAO.deleteSubjectByID(subjectID);
+        markDAO.deleteStudentMarksBySubjectID(subjectID);
+    }
+
+    private void deleteClassMarks(HttpSession session, String objectToDelete) throws SQLException {
+        int classID = classDAO.getClassIDs((int) session.getAttribute("Organization")).get(objectToDelete);
+        Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
+
+        for (int i = 0; i < studentIDs.length; i++) {
+            int classStudentID = classStudentDAO.getID(classID, studentIDs[i]);
+            markDAO.deleteStudentMarksByClassStudentID(classStudentID);
         }
     }
 

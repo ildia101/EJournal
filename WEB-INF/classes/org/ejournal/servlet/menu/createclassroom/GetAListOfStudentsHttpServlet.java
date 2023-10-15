@@ -30,22 +30,7 @@ public class GetAListOfStudentsHttpServlet extends HttpServlet {
         request.setAttribute("Letter", classParametersRequest.getClassLetter());
         request.setAttribute("NumberOfStudents", String.valueOf(classParametersRequest.getNumberOfStudents()));
 
-        if(Objects.equals(classParametersRequest.getClassNumber(), "-")){
-            request.setAttribute("Error", true);
-            request.setAttribute("InvalidData", "Невірне значення у полі з цифрою класу");
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
-            requestDispatcher.forward(request, response);
-        } else if(classParametersRequest.getClassLetter().isEmpty()){
-            request.setAttribute("Error", true);
-            request.setAttribute("InvalidData", "Поле з буквою класа порожнє");
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
-            requestDispatcher.forward(request, response);
-        } else if(classParametersRequest.getNumberOfStudents()<1){
-            request.setAttribute("Error", true);
-            request.setAttribute("InvalidData", "Невірне значення у полі кількості учнів");
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
-            requestDispatcher.forward(request, response);
-        } else {
+        if(verifyRequest(request, response, classParametersRequest)) {
 			String classroom = classParametersRequest.getClassNumber() + "-" + classParametersRequest.getClassLetter();
 		
 			try {
@@ -70,5 +55,25 @@ public class GetAListOfStudentsHttpServlet extends HttpServlet {
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher("2ndStep.jsp");
 			requestDispatcher.forward(request, response);
 		}
+    }
+
+    private static boolean verifyRequest(HttpServletRequest request, HttpServletResponse response, ClassParametersRequest classParametersRequest) throws ServletException, IOException {
+        if(Objects.equals(classParametersRequest.getClassNumber(), "-")){
+            request.setAttribute("Error", true);
+            request.setAttribute("InvalidData", "Невірне значення у полі з цифрою класу");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+            requestDispatcher.forward(request, response);
+        } else if(classParametersRequest.getClassLetter().isEmpty()){
+            request.setAttribute("Error", true);
+            request.setAttribute("InvalidData", "Поле з буквою класа порожнє");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+            requestDispatcher.forward(request, response);
+        } else if(classParametersRequest.getNumberOfStudents()<1){
+            request.setAttribute("Error", true);
+            request.setAttribute("InvalidData", "Невірне значення у полі кількості учнів");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
+            requestDispatcher.forward(request, response);
+        }
+        return true;
     }
 }

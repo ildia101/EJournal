@@ -35,27 +35,7 @@ public class LoginHttpServlet extends HttpServlet {
             UserEntity user = userDAO.getUser(userParametersRequest.getEmail());
             if(user!=null) {
                 if (Objects.equals(user.getPassword(), userParametersRequest.getPassword())) {
-                    session.setAttribute("LoggedIn", true);
-
-                    session.setAttribute("Role", user.getRole());
-
-                    session.setAttribute("Principal", "principal");
-                    session.setAttribute("Tutor", "tutor");
-                    session.setAttribute("Teacher", "teacher");
-
-
-                    int organization = user.getOrganizationId();
-                    if (organization == -1) {
-                        request.setAttribute("EnterCodePage", true);
-                        session.setAttribute("Email", userParametersRequest.getEmail());
-
-                        RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
-                        requestDispatcher.forward(request, response);
-                    } else {
-                        session.setAttribute("Organization", organization);
-                        RequestDispatcher requestDispatcher = request.getRequestDispatcher("UserInSystem.jsp");
-                        requestDispatcher.forward(request, response);
-                    }
+                    loginUser(request, response, session, userParametersRequest, user);
                 } else {
                     request.setAttribute("InvalidData", "Неправильно введений пароль");
                     returnError(request, response, savedInfo);
@@ -66,6 +46,30 @@ public class LoginHttpServlet extends HttpServlet {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void loginUser(HttpServletRequest request, HttpServletResponse response, HttpSession session, UserParametersRequest userParametersRequest, UserEntity user) throws ServletException, IOException {
+        session.setAttribute("LoggedIn", true);
+
+        session.setAttribute("Role", user.getRole());
+
+        session.setAttribute("Principal", "principal");
+        session.setAttribute("Tutor", "tutor");
+        session.setAttribute("Teacher", "teacher");
+
+
+        int organization = user.getOrganizationId();
+        if (organization == -1) {
+            request.setAttribute("EnterCodePage", true);
+            session.setAttribute("Email", userParametersRequest.getEmail());
+
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("InputYourCode.jsp");
+            requestDispatcher.forward(request, response);
+        } else {
+            session.setAttribute("Organization", organization);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("UserInSystem.jsp");
+            requestDispatcher.forward(request, response);
         }
     }
 

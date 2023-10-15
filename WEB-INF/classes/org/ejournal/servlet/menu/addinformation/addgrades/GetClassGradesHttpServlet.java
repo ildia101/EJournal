@@ -6,6 +6,8 @@ import jakarta.servlet.http.*;
 import org.ejournal.dao.*;
 import org.ejournal.dao.entities.MarkEntity;
 import org.ejournal.dao.entities.StudentEntity;
+import org.ejournal.dto.ClassGradesParametersRequest;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -50,23 +52,15 @@ public class GetClassGradesHttpServlet extends HttpServlet {
             if(subject==null){
                 subject = request.getParameter("subject");
             }
+
+            ClassGradesParametersRequest gradesParametersRequest = new ClassGradesParametersRequest(organization, classroom, subject);
             StudentEntity students[];
             int numberOfPage = (int) session.getAttribute("NumberOfPage");
 
-            if (Objects.equals(classroom, "-")) {
-                request.setAttribute("Error", true);
-                request.setAttribute("InvalidData", "Невірне значення у полі з класом");
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/ChooseClassAndSubject.jsp");
-                requestDispatcher.forward(request, response);
-            } else if (Objects.equals(subject, "-")) {
-                request.setAttribute("Error", true);
-                request.setAttribute("InvalidData", "Невірне значення у полі з предметом");
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/ChooseClassAndSubject.jsp");
-                requestDispatcher.forward(request, response);
-            } else {
+            if(verifyRequest(request, response, gradesParametersRequest)) {
                 int classID;
                 try {
-                    classID = classDAO.getClassIDs(organization).get(classroom);
+                    classID = classDAO.getClassIDs(gradesParametersRequest.getOrganization()).get(gradesParametersRequest.getClassroom());
                     Integer studentIDs[] = classStudentDAO.getAllStudentIDs(classID);
                     students = studentDAO.getStudentsByIdAsArray(studentIDs);
                 } catch (SQLException sqlException) {
@@ -97,12 +91,27 @@ public class GetClassGradesHttpServlet extends HttpServlet {
 
                 session.setAttribute("Marks", requiredMarks.toArray(new MarkEntity[0]));
 
-                session.setAttribute("Classroom", classroom);
-                session.setAttribute("Subject", subject);
+                session.setAttribute("Classroom", gradesParametersRequest.getClassroom());
+                session.setAttribute("Subject", gradesParametersRequest.getSubject());
 
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/InputGrades.jsp");
                 requestDispatcher.forward(request, response);
             }
         }
+    }
+
+    private static boolean verifyRequest(HttpServletRequest request, HttpServletResponse response, ClassGradesParametersRequest gradesParametersRequest) throws ServletException, IOException {
+        if (Objects.equals(gradesParametersRequest.getClassroom(), "-")) {
+            request.setAttribute("Error", true);
+            request.setAttribute("InvalidData", "Невірне значення у полі з класом");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/ChooseClassAndSubject.jsp");
+            requestDispatcher.forward(request, response);
+        } else if (Objects.equals(gradesParametersRequest.getSubject(), "-")) {
+            request.setAttribute("Error", true);
+            request.setAttribute("InvalidData", "Невірне значення у полі з предметом");
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("AddGrades/ChooseClassAndSubject.jsp");
+            requestDispatcher.forward(request, response);
+        }
+        return true;
     }
 }
