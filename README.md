@@ -1,6 +1,4 @@
 # E-journal project
-Made by
+Code by https://github.com/burbon-79
 
-https://github.com/burbon-79
-
-https://github.com/shenzery
+Design by https://github.com/shenzery
